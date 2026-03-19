@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row align-items-center">
+    <div class="col-md-6 mb-4 mb-md-0">
+      <h1 class="display-4 fw-bold">Welcome to Ramesh Kitchen Mixer</h1>
+      <p class="lead text-muted">Your one-stop destination for premium kitchen mixers, expert repair services, and exceptional customer support.</p>
+      <a href="/products" class="btn btn-primary btn-lg mt-3">Shop Now</a>
+    </div>
+    <div class="col-md-6">
+      <img src="{% static 'rm2.jpg' %}" alt="Kitchen Mixer" class="img-fluid rounded shadow">
+    </div>
+  </div>
+
+
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <!-- Profile Header -->
+    <div class="text-center mb-5">
+        <h2 class="fw-bold">👤 Your Profile</h2>
+        <p class="text-muted">Welcome, {{ user.first_name }}</p>
+    </div>
+
+    <div class="row">
+
+        <!-- ORDERS SECTION -->
+        <div class="col-md-6">
+            <h4 class="mb-3">🛒 Your Orders</h4>
+
+            {% for order in orders %}
+            <div class="card shadow-sm mb-3 border-0 rounded-4">
+                <div class="card-body">
+
+                    <h5 class="fw-bold text-primary">
+                        {{ order.product_name }}
+                    </h5>
+                     <p class="mb-1">
+                        <strong>Price:</strong> ₹{{ order.price }}
+                    </p>
+                     <p class="mb-1">
+                        <strong>Quantity:</strong> {{ order.quantity }}
+                    </p>
+                    <p class="mb-1">
+                        <strong>Total:</strong> ₹{{ order.total }}
+                    </p>
+
+                    <a href="{% url 'delete_order' order.id %}" 
+                       class="btn btn-danger btn-sm mt-2">
+                       🗑 Cancel Order
+                    </a>
+
+                </div>
+            </div>
+            {% empty %}
+            <div class="alert alert-info">
+                No orders yet 😔
+            </div>
+            {% endfor %}
+        </div>
+
+
+        <!-- REPAIR SECTION -->
+        <div class="col-md-6">
+            <h4 class="mb-3">🔧 Repair Requests</h4>
+
+            {% for repair in repairs %}
+            <div class="card shadow-sm mb-3 border-0 rounded-4">
+                <div class="card-body">
+
+                     <p class="mb-2">
+                        <strong> Your Name:</strong> {{ repair.name }}
+                    </p>
+                    <p class="mb-2">
+                        <strong> Your Problem Description:</strong> {{ repair.description }}
+                    </p>
+
+                    <a href="{% url 'delete_repair' repair.id %}" 
+                       class="btn btn-danger btn-sm">
+                       🗑 Cancel Problem
+                    </a>
+
+                </div>
+            </div>
+            {% empty %}
+            <div class="alert alert-info">
+                No repair requests 😔
+            </div>
+            {% endfor %}
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

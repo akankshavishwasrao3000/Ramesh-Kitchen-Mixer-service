@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div id="carouselExample" class="carousel slide" style="margin:25px;"  data-bs-ride="carousel" data-bs-interval="2000">
+  <div class="carousel-inner">
+    <div class="carousel-item active">
+      <img src="{% static 'mix1.jpg' %}" class="d-block w-100" alt="..." style="max-height: 500px; width:20">
+    </div>
+    <div class="carousel-item">
+      <img src="{% static 'mi1.jpg' %}" class="d-block w-100" alt="..." style="max-height: 500px; width:20">
+    </div>
+    <div class="carousel-item">
+      <img src="{% static 'mi2.webp' %}" class="d-block w-100" alt="..." style="max-height: 500px; width:20">
+    </div>
+    <div class="carousel-item">
+      <img src="{% static 'mix2.jpg' %}" class="d-block w-100" alt="..." style="max-height: 500px; width:20">
+    </div>
+  </div>
+  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+</div>
+
+
+<!-- Section Title -->
+<div class="section2" style="color:#333; background-color:#f8f9fa; padding:60px 0;">
+
+<div class="text-center mb-5">
+<h1 class="fw-bold">All Premium Mixers</h1>
+<p class="text-muted">Explore our powerful and stylish mixer collection designed for every kitchen.</p>
+</div>
+
+<div class="container">
+<div class="row">
+
+<!-- Product 1 -->
+<div class="col-lg-3 col-md-6 col-sm-12 mb-4">
+<div class="card h-100 shadow-sm">
+
+<img src="{% static 'mixer1.jpg' %}" class="card-img-top">
+
+<div class="card-body">
+
+
+<h5 class="card-title fw-bold">Ramesh Mixer</h5>
+
+<h6 class="text-danger fw-bold">₹3500</h6>
+
+<ul class="list-unstyled small text-muted">
+<li>✔ 900W Powerful Motor</li>
+<li>✔ 3 Stainless Steel Jars</li>
+<li>✔ 24 Month Warranty</li>
+</ul>
+
+<a href="/order?product_id=1" class="btn btn-primary w-100">Order Now</a>
+
+</div>
+</div>
+</div>
+
+<!-- Product 2 -->
+<div class="col-lg-3 col-md-6 col-sm-12 mb-4">
+<div class="card h-100 shadow-sm">
+
+<img src="{% static 'm3.jpg' %}" class="card-img-top">
+
+<div class="card-body">
+
+<h5 class="card-title fw-bold">Ramesh Mixer</h5>
+
+<h6 class="text-danger fw-bold">₹4550</h6>
+
+<ul class="list-unstyled small text-muted">
+<li>✔ 900W Powerful Motor</li>
+<li>✔ 3 Stainless Steel Jars</li>
+<li>✔ 24 Month Warranty</li>
+</ul>
+
+<a href="/order?product_id=2" class="btn btn-primary w-100">Order Now</a>
+
+</div>
+</div>
+</div>
+
+<!-- Product 3 -->
+<div class="col-lg-3 col-md-6 col-sm-12 mb-4">
+<div class="card h-100 shadow-sm">
+
+<img src="{% static 'mixer2.jpg' %}" class="card-img-top">
+
+<div class="card-body">
+
+<h5 class="card-title fw-bold">Ramesh Mixer</h5>
+
+<h6 class="text-danger fw-bold">₹3500</h6>
+
+<ul class="list-unstyled small text-muted">
+<li>✔ 900W Powerful Motor</li>
+<li>✔ 3 Stainless Steel Jars</li>
+<li>✔ 24 Month Warranty</li>
+</ul>
+
+<a href="/order?product_id=3" class="btn btn-primary w-100">Order Now</a>
+
+</div>
+</div>
+</div>
+
+<!-- Product 4 -->
+<div class="col-lg-3 col-md-6 col-sm-12 mb-4">
+<div class="card h-100 shadow-sm">
+
+<img src="{% static 'mixer3.jpg' %}" class="card-img-top">
+
+<div class="card-body">
+
+<h5 class="card-title fw-bold">Ramesh Mixer</h5>
+
+<h6 class="text-danger fw-bold">₹4550</h6>
+
+<ul class="list-unstyled small text-muted">
+<li>✔ 900W Powerful Motor</li>
+<li>✔ 3 Stainless Steel Jars</li>
+<li>✔ 24 Month Warranty</li>
+</ul>
+
+<a href="/order?product_id=4" class="btn btn-primary w-100">Order Now</a>
+
+</div>
+</div>
+</div>
+
+</div>
+</div>
+</div>
+
+
+ 
+{% endblock %}
+

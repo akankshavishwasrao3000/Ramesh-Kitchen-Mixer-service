@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block content %}
+{% if not user.is_authenticated %}
+<div class="alert alert-warning text-center">
+Please login to place your order.
+</div>
+{% endif %}
+
+<section class="py-5 bg-light">
+
+  <div class="container-fluid">
+
+    <!-- Title -->
+    <div class="text-center mb-4">
+      <h2 class="fw-bold">Place Your Order</h2>
+      <p class="text-muted">Complete your purchase securely</p>
+    </div>
+
+    <div class="row">
+
+      <div class="col-12">
+
+        <div class="card shadow border-0">
+          <div class="card-body p-5">
+
+           <form method="POST" action="?product_id={{ request.GET.product_id }}">
+
+              {% csrf_token %}
+              <input type="hidden" name="product_id" value="{{ request.GET.product_id }}">
+
+              <div class="row">
+
+                <!-- Product Name -->
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Product</label>
+                  <input type="text" name="product_name" class="form-control" value="{{ product_name }}" readonly>
+                </div>
+
+                <!-- Price -->
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Price (₹)</label>
+                  <input type="number" name="price" id="price" class="form-control" value="{{ price }}" readonly>
+                </div>
+
+                <!-- Quantity -->
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Quantity</label>
+                  <input type="number" name="quantity" id="quantity" class="form-control" value="1" min="1">
+                </div>
+
+                <!-- Total -->
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Total Amount (₹)</label>
+                  <input type="number" name="total" id="total" class="form-control" readonly>
+                </div>
+
+                <hr class="my-4">
+
+                <!-- Customer Info -->
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Full Name</label>
+                  <input type="text" name="name" class="form-control" placeholder="Enter your full name" pattern="[A-Za-z ]+" required>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Phone Number</label>
+                  <input type="tel" name="phone" class="form-control" placeholder="Enter your phone number" pattern="[0-9]{10}" maxlength="10" required>
+                </div>
+
+                <div class="col-12 mb-3">
+                  <label class="form-label">Address</label>
+                  <textarea name="address" class="form-control" rows="3" placeholder="Enter your full address"  required></textarea>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="col-12 d-grid">
+                  <button type="submit" class="btn btn-primary btn-lg">
+                    Confirm Order
+                  </button>
+                </div>
+
+                <br><br>
+
+                <!-- Success Message -->
+                {% if messages %}
+                  {% for message in messages %}
+                    <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                      {{ message }}
+                      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                  {% endfor %}
+                {% endif %}
+
+              </div>
+
+            </form>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+<!-- JavaScript for Total Calculation -->
+<script>
+  const priceInput = document.getElementById("price");
+  const quantityInput = document.getElementById("quantity");
+  const totalInput = document.getElementById("total");
+
+  function calculateTotal() {
+    const price = parseFloat(priceInput.value) || 0;
+    const quantity = parseInt(quantityInput.value) || 1;
+    totalInput.value = price * quantity;
+  }
+
+  quantityInput.addEventListener("input", calculateTotal);
+  calculateTotal();
+</script>
+
+{% endblock %}
