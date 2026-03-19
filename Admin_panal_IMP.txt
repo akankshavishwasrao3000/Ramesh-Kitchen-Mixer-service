@@ -1,3 +1,0 @@
-Username  :admin
-Email     :admin123@gamil.com
-password  :admin123
