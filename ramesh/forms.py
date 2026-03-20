@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
+from .models import Order
 
 class RegisterForm(UserCreationForm):
     email = forms.EmailField()
@@ -18,3 +19,9 @@ class RegisterForm(UserCreationForm):
     'password1': forms.PasswordInput(attrs={'class':'form-control'}),
     'password2': forms.PasswordInput(attrs={'class':'form-control'}),
 }
+        
+
+class OrderUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Order
+        fields = ['quantity']        

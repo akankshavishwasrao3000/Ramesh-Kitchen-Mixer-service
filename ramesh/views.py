@@ -1,6 +1,6 @@
 import re
 from unicodedata import name
-from django.shortcuts import render  ,redirect
+from django.shortcuts import render  ,redirect , get_object_or_404
 from matplotlib.style import context
 from requests import request 
 from ramesh.models import Repair
@@ -15,6 +15,7 @@ from .forms import RegisterForm
 from django.contrib.auth.decorators import login_required
 from .models import Repair
 from .models import Order, Repair
+from .forms import OrderUpdateForm
 
 # Signup View
 def signup_view(request):
@@ -191,3 +192,20 @@ def delete_repair(request, id):
     repair = Repair.objects.get(id=id, user=request.user)
     repair.delete()
     return redirect('profile')
+
+
+def update_order(request, id):
+
+    order = get_object_or_404(Order, id=id)
+
+    if request.method == "POST":
+        form = OrderUpdateForm(request.POST, instance=order)
+
+        if form.is_valid():
+            form.save()
+            return redirect('profile')
+
+    else:
+        form = OrderUpdateForm(instance=order)
+
+    return render(request, 'update_order.html', {'form': form})

@@ -32,7 +32,9 @@
                     <p class="mb-1">
                         <strong>Total:</strong> ₹{{ order.total }}
                     </p>
-
+                     <a href="{% url 'update_order' order.id %}" class="btn btn-warning btn-sm">
+                                   ✏ Update
+                        </a>
                     <a href="{% url 'delete_order' order.id %}" 
                        class="btn btn-danger btn-sm mt-2">
                        🗑 Cancel Order
