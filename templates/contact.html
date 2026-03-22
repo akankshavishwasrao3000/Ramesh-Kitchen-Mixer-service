@@ -1,87 +1,91 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
 
- <div class="section" style="color: #333; background-color: #f8f9fa; padding: 60px 0;">
-
-  <!-- Heading FIRST -->
-  <div class="text-center mb-5">
-    <h1 class="fw-bold">Contact Ramesh Kitchen Mixer</h1>
-    <p class="text-muted">We are here to help you anytime.</p>
-  </div>
-
-  <div class="container my-5">
-
-    <div class="row text-center g-4">
-
+<!-- Contact Information -->
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="fw-bold mb-3">Contact Information</h2>
+      <p class="text-muted fs-5">Multiple ways to connect with Ramesh Kitchen Mixer</p>
+    </div>
+    <div class="row g-4">
       <!-- Call -->
-      <div class="col-lg-4 col-md-6">
-        <div class="p-4 border rounded shadow-sm h-100">
-          <i class="bi bi-telephone-fill fs-1 text-primary"></i>
-          <h5 class="fw-bold mt-3">
-            <a href="tel:+919921071945" class="text-decoration-none text-dark">
-              Call Us
-            </a>
-          </h5>
-          <p>+91 9921071945</p>
+      <div class="col-lg-3 col-md-6">
+        <div class="contact-card card h-100 border-0 shadow-lg text-center p-4">
+          <div class="card-body">
+            <i class="fas fa-phone fa-3x text-primary mb-3"></i>
+            <h5 class="card-title fw-bold">Call Us</h5>
+            <p class="card-text mb-3">+91 9921071945</p>
+            <a href="tel:+919921071945" class="btn btn-primary btn-sm">Call Now</a>
+          </div>
         </div>
       </div>
 
       <!-- WhatsApp -->
-      <div class="col-lg-4 col-md-6">
-        <div class="p-4 border rounded shadow-sm h-100">
-          <i class="bi bi-whatsapp fs-1 text-success"></i>
-          <h5 class="fw-bold mt-3">
-            <a href="https://wa.me/919921071945" target="_blank" class="text-decoration-none text-dark">
-              WhatsApp
-            </a>
-          </h5>
-          <p>Chat with us directly</p>
+      <div class="col-lg-3 col-md-6">
+        <div class="contact-card card h-100 border-0 shadow-lg text-center p-4">
+          <div class="card-body">
+            <i class="fab fa-whatsapp fa-3x text-success mb-3"></i>
+            <h5 class="card-title fw-bold">WhatsApp</h5>
+            <p class="card-text mb-3">Chat with us directly</p>
+            <a href="https://wa.me/919921071945" target="_blank" class="btn btn-success btn-sm">Message</a>
+          </div>
         </div>
       </div>
 
-     <!-- Instagram -->
-<div class="col-lg-4 col-md-6">
-  <div class="p-4 border rounded shadow-sm h-100 text-center">
-
-    <a href="https://www.instagram.com/ramesh.vishwasrao.14" target="_blank" style="text-decoration:none; color:inherit;">
-      <i class="bi bi-instagram fs-1 text-danger"></i>
-      <h5 class="fw-bold mt-3">Instagram</h5>
-      <p>@ramesh_kitchen_mixer</p>
-    </a>
-
-  </div>
-</div>
+      <!-- Instagram -->
+      <div class="col-lg-3 col-md-6">
+        <div class="contact-card card h-100 border-0 shadow-lg text-center p-4">
+          <div class="card-body">
+            <i class="fab fa-instagram fa-3x text-danger mb-3"></i>
+            <h5 class="card-title fw-bold">Instagram</h5>
+            <p class="card-text mb-3">@ramesh_kitchen_mixer</p>
+            <a href="https://www.instagram.com/ramesh.vishwasrao.14" target="_blank" class="btn btn-danger btn-sm">Follow</a>
+          </div>
+        </div>
+      </div>
 
       <!-- Email -->
-      <div class="col-lg-4 col-md-6">
-        <div class="p-4 border rounded shadow-sm h-100">
-          <i class="bi bi-envelope-fill fs-1 text-warning"></i>
-          <h5 class="fw-bold mt-3">Email</h5>
-          <p>rameshmixer@gmail.com</p>
+      <div class="col-lg-3 col-md-6">
+        <div class="contact-card card h-100 border-0 shadow-lg text-center p-4">
+          <div class="card-body">
+            <i class="fas fa-envelope fa-3x text-warning mb-3"></i>
+            <h5 class="card-title fw-bold">Email</h5>
+            <p class="card-text mb-3">rameshmixer@gmail.com</p>
+            <a href="mailto:rameshmixer@gmail.com" class="btn btn-warning btn-sm">Email</a>
+          </div>
         </div>
       </div>
-
-<!-- Address -->
-<div class="col-lg-4 col-md-6">
-  <div class="p-4 border rounded shadow-sm h-100 text-center">
-
-    <a href="https://www.google.com/maps/search/?api=1&query=Ramesh+Mixer+Belhe"
-       target="_blank"
-       style="text-decoration:none; color:inherit;">
-
-      <i class="bi bi-geo-alt-fill fs-1 text-secondary"></i>
-      <h5 class="fw-bold mt-3">Address</h5>
-      <p>Ramesh Mixer, Belhe, Maharashtra 412410</p>
-
-    </a>
-
-  </div>
-</div>
     </div>
 
+    <!-- Address Section -->
+    <div class="row mt-5">
+      <div class="col-lg-6">
+        <div class="contact-card card border-0 shadow-lg p-4">
+          <div class="card-body">
+            <i class="fas fa-map-marker-alt fa-2x text-secondary mb-3"></i>
+            <h5 class="card-title fw-bold">Visit Our Location</h5>
+            <p class="card-text">Ramesh Mixer<br>Belhe, Maharashtra 412410</p>
+            <a href="https://www.google.com/maps/search/?api=1&query=Ramesh+Mixer+Belhe" target="_blank" class="btn btn-secondary btn-sm">View on Map</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="contact-card card border-0 shadow-lg p-4">
+          <div class="card-body">
+            <i class="fas fa-clock fa-2x text-info mb-3"></i>
+            <h5 class="card-title fw-bold">Business Hours</h5>
+            <p class="card-text">
+              <strong>Monday - Saturday:</strong> 9:00 AM - 8:00 PM<br>
+              <strong>Sunday:</strong> 10:00 AM - 6:00 PM
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
+</section>
 
-</div>
-  
 {% endblock %}

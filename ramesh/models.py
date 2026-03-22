@@ -37,4 +37,21 @@ class Order(models.Model):
 
    
 
+# Profile Model
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='profile_images/', blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.user.username}'s profile"
+
+    def save(self, *args, **kwargs):
+        try:
+            old = Profile.objects.get(pk=self.pk)
+            if old.image:
+                old.image.delete(save=False)
+        except:
+            pass
+        super().save(*args, **kwargs)
+
 # Create your models here.

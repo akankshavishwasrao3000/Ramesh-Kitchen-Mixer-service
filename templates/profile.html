@@ -2,84 +2,195 @@
 
 {% block content %}
 
-<div class="container mt-5">
+<div class="container-fluid py-5" style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh;">
+    <div class="container">
 
-    <!-- Profile Header -->
-    <div class="text-center mb-5">
-        <h2 class="fw-bold">👤 Your Profile</h2>
-        <p class="text-muted">Welcome, {{ user.first_name }}</p>
-    </div>
-
-    <div class="row">
-
-        <!-- ORDERS SECTION -->
-        <div class="col-md-6">
-            <h4 class="mb-3">🛒 Your Orders</h4>
-
-            {% for order in orders %}
-            <div class="card shadow-sm mb-3 border-0 rounded-4">
-                <div class="card-body">
-
-                    <h5 class="fw-bold text-primary">
-                        {{ order.product_name }}
-                    </h5>
-                     <p class="mb-1">
-                        <strong>Price:</strong> ₹{{ order.price }}
-                    </p>
-                     <p class="mb-1">
-                        <strong>Quantity:</strong> {{ order.quantity }}
-                    </p>
-                    <p class="mb-1">
-                        <strong>Total:</strong> ₹{{ order.total }}
-                    </p>
-                     <a href="{% url 'update_order' order.id %}" class="btn btn-warning btn-sm">
-                                   ✏ Update
-                        </a>
-                    <a href="{% url 'delete_order' order.id %}" 
-                       class="btn btn-danger btn-sm mt-2">
-                       🗑 Cancel Order
-                    </a>
-
-                </div>
+        <!-- Profile Header -->
+        <div class="text-center mb-5">
+            <div class="profile-avatar mx-auto mb-3" style="width: 100px; height: 100px; background: linear-gradient(45deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 2.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+                {% if profile_image %}
+                    <img src="{{ profile_image }}" alt="Profile Image" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                {% else %}
+                    <i class="fas fa-user"></i>
+                {% endif %}
             </div>
-            {% empty %}
-            <div class="alert alert-info">
-                No orders yet 😔
-            </div>
-            {% endfor %}
+            <h1 class="fw-bold text-dark mb-2">Welcome, {{ user.first_name|default:user.username }}!</h1>
+            <p class="text-muted fs-5">Manage your account and view your activity</p>
         </div>
 
-
-        <!-- REPAIR SECTION -->
-        <div class="col-md-6">
-            <h4 class="mb-3">🔧 Repair Requests</h4>
-
-            {% for repair in repairs %}
-            <div class="card shadow-sm mb-3 border-0 rounded-4">
-                <div class="card-body">
-
-                     <p class="mb-2">
-                        <strong> Your Name:</strong> {{ repair.name }}
-                    </p>
-                    <p class="mb-2">
-                        <strong> Your Problem Description:</strong> {{ repair.description }}
-                    </p>
-
-                    <a href="{% url 'delete_repair' repair.id %}" 
-                       class="btn btn-danger btn-sm">
-                       🗑 Cancel Problem
-                    </a>
-
+        <!-- User Info Card -->
+        <div class="row justify-content-center mb-5">
+            <div class="col-lg-8">
+                <div class="card shadow-lg border-0 rounded-4" style="background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);">
+                    <div class="card-body p-4">
+                        <h4 class="card-title mb-4 text-center">
+                            <i class="fas fa-id-card text-primary me-2"></i>Account Information
+                        </h4>
+                        <div class="row text-center">
+                            <div class="col-md-4 mb-3">
+                                <div class="info-item">
+                                    <i class="fas fa-user-circle fa-2x text-info mb-2"></i>
+                                    <h6 class="text-muted">Full Name</h6>
+                                    <p class="fw-bold">{{ user.first_name }} {{ user.last_name }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="info-item">
+                                    <i class="fas fa-envelope fa-2x text-success mb-2"></i>
+                                    <h6 class="text-muted">Email</h6>
+                                    <p class="fw-bold">{{ user.email }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="info-item">
+                                    <i class="fas fa-calendar fa-2x text-warning mb-2"></i>
+                                    <h6 class="text-muted">Member Since</h6>
+                                    <p class="fw-bold">{{ user.date_joined|date:"M Y" }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="text-center">
+                            <button type="button" class="btn btn-outline-primary me-2 mb-2" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                                <i class="fas fa-edit me-1"></i>Edit Profile Image
+                            </button>
+                            <a href="{% url 'logout' %}" class="btn btn-outline-danger mb-2">
+                                <i class="fas fa-sign-out-alt me-1"></i>Logout
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
-            {% empty %}
-            <div class="alert alert-info">
-                No repair requests 😔
+        </div>
+
+        <!-- Activity Sections -->
+        <div class="row">
+
+            <!-- ORDERS SECTION -->
+            <div class="col-lg-6 mb-4">
+                <div class="card shadow-lg border-0 rounded-4 h-100" style="background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);">
+                    <div class="card-header bg-primary text-white rounded-top-4">
+                        <h4 class="mb-0">
+                            <i class="fas fa-shopping-cart me-2"></i>Your Orders
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        {% for order in orders %}
+                        <div class="order-item mb-3 p-3 border rounded-3" style="background: #f8f9fa;">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h6 class="fw-bold text-primary mb-2">{{ order.product_name }}</h6>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <small class="text-muted">Price: ₹{{ order.price }}</small>
+                                        </div>
+                                        <div class="col-6">
+                                            <small class="text-muted">Qty: {{ order.quantity }}</small>
+                                        </div>
+                                    </div>
+                                    <div class="mt-1">
+                                        <span class="badge bg-success">Total: ₹{{ order.total }}</span>
+                                    </div>
+                                </div>
+                                <div class="btn-group-vertical btn-group-sm">
+                                    <a href="{% url 'update_order' order.id %}" class="btn btn-warning btn-sm">
+                                        <i class="fas fa-edit"></i> Update
+                                    </a>
+                                    <a href="{% url 'delete_order' order.id %}" class="btn btn-danger btn-sm mt-1">
+                                        <i class="fas fa-trash"></i> Cancel
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-shopping-bag fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No orders yet. Start shopping!</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
-            {% endfor %}
+
+            <!-- REPAIR SECTION -->
+            <div class="col-lg-6 mb-4">
+                <div class="card shadow-lg border-0 rounded-4 h-100" style="background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);">
+                    <div class="card-header bg-info text-white rounded-top-4">
+                        <h4 class="mb-0">
+                            <i class="fas fa-tools me-2"></i>Repair Requests
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        {% for repair in repairs %}
+                        <div class="repair-item mb-3 p-3 border rounded-3" style="background: #f8f9fa;">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h6 class="fw-bold text-info mb-2">{{ repair.name }}</h6>
+                                    <p class="mb-1 text-muted small">{{ repair.description|truncatechars:100 }}</p>
+                                    <small class="text-muted">Submitted: {{ repair.created_at|date:"M d, Y" }}</small>
+                                </div>
+                                <a href="{% url 'delete_repair' repair.id %}" class="btn btn-danger btn-sm">
+                                    <i class="fas fa-trash"></i> Cancel
+                                </a>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-wrench fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No repair requests. Need help?</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
         </div>
 
     </div>
 </div>
+
+<!-- Edit Profile Image Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editProfileModalLabel">Edit Profile Image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="profileImageForm" method="post" enctype="multipart/form-data" action="{% url 'upload_profile_image' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="profileImage" class="form-label">Choose a new profile image</label>
+                        <input type="file" class="form-control" id="profileImage" name="profile_image" accept="image/*" required>
+                        <div class="form-text">Supported formats: JPG, PNG, GIF. Max size: 5MB.</div>
+                    </div>
+                    <div class="text-center">
+                        <img id="imagePreview" src="#" alt="Image Preview" class="img-fluid rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover; display: none;">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" form="profileImageForm" class="btn btn-primary">Upload Image</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('profileImage').addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const preview = document.getElementById('imagePreview');
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    }
+});
+</script>
 
 {% endblock %}

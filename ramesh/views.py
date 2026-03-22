@@ -14,7 +14,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from .forms import RegisterForm
 from django.contrib.auth.decorators import login_required
 from .models import Repair
-from .models import Order, Repair
+from .models import Order, Repair, Profile
 from .forms import OrderUpdateForm
 
 # Signup View
@@ -173,10 +173,13 @@ def order(request):
 def profile(request):
     orders = Order.objects.filter(user=request.user)
     repairs = Repair.objects.filter(user=request.user)
+    profile_obj = Profile.objects.filter(user=request.user).first()
+    profile_image = profile_obj.image.url if profile_obj and profile_obj.image else None
 
     return render(request, "profile.html", {
         "orders": orders,
-        "repairs": repairs
+        "repairs": repairs,
+        "profile_image": profile_image
     })
 
 
@@ -203,9 +206,24 @@ def update_order(request, id):
 
         if form.is_valid():
             form.save()
+            order.total = order.price * order.quantity
+            order.save()
             return redirect('profile')
 
     else:
         form = OrderUpdateForm(instance=order)
 
     return render(request, 'update_order.html', {'form': form})
+
+@login_required
+def upload_profile_image(request):
+    if request.method == 'POST':
+        profile, created = Profile.objects.get_or_create(user=request.user)
+        if 'profile_image' in request.FILES:
+            profile.image = request.FILES['profile_image']
+            profile.save()
+            if created:
+                messages.success(request, "Profile created and image uploaded successfully!")
+            else:
+                messages.success(request, "Profile image updated successfully!")
+        return redirect('profile')

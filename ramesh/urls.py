@@ -17,6 +17,8 @@ urlpatterns = [
     path("order/", views.order, name='order'),
 
     path('profile/', views.profile, name='profile'),
+    path('upload-profile-image/', views.upload_profile_image, name='upload_profile_image'),
+    path('update-order/<int:id>/', views.update_order, name='update_order'),
     path('delete-order/<int:id>/', views.delete_order, name='delete_order'),
     path('delete-repair/<int:id>/', views.delete_repair, name='delete_repair'),
 ]
