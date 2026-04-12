@@ -41,6 +41,7 @@ Ramesh Kitchen Mixer is a complete e-commerce and service platform that enables 
 - Product catalog with 4 mixer models
 - Dynamic order placement with quantity selection
 - Price calculation and total amount display
+- Direct WhatsApp Ordering integration (Storefront & Checkout)
 - Order history and management
 - Order cancellation capability
 
@@ -188,8 +189,9 @@ Access the application at `http://127.0.0.1:8000/`
 - **View Services & Contact Info**: Public access to service details and support information
 
 ### Update (U)
-- **Limited Update Capability**: Current version doesn't support direct order/repair updates
-- **Future Enhancement**: Could implement edit functionality for pending repairs
+- **Update Orders**: Users can update the quantity of their submitted mixer orders dynamically from the database.
+  - Route: `/update-order/<id>/`
+  - Validates boundaries securely.
 
 ### Delete (D)
 - **Cancel Orders**: Users can delete their orders from profile
@@ -240,11 +242,14 @@ home/
 
 ## 🔐 Security Features
 
-- CSRF protection enabled
+- CSRF protection enabled across all active endpoints
+- Insecure Direct Object Reference (IDOR) zero-trust prevention logic for database interactions
+- Hardened database integer boundary constraints resolving native 500 crashes
+- Unhandled Exception routing safely translating queries into strict 404 pages instead of 500 errors
 - Password validation and hashing
 - Environment-based configuration for secrets
-- User authentication decorators
-- Per-user data access control
+- User authentication decorators (`@login_required`) actively blocking unauthorized flow data drops
+- Strict Per-user data access control (`get_object_or_404(..., user=request.user)`)
 
 ## 🎨 Features Detail
 
