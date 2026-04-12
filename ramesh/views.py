@@ -17,6 +17,7 @@ from .models import Repair
 from .models import Order, Repair, Profile
 from .forms import OrderUpdateForm
 
+
 # Signup View
 def signup_view(request):
     if request.method == "POST":
@@ -55,18 +56,23 @@ def logout_view(request):
 # Protect Home Page
 @login_required
 def home(request):
-    return render(request, "index.html")  # your main project page
+    return render(request, "index.html")  
 
 def index(request):
    
     return render(request, 'index.html')
     # return HttpResponse("This is home page")
 
-def products(request):
 
+
+
+def products(request):
     return render(request, 'products.html')
 
+
 def services(request):
+   
+   return render(request, 'services.html')
    
    return render(request, 'services.html')
 
@@ -74,14 +80,12 @@ def contact(request):
 
     return render(request, 'contact.html')
 
-from django.shortcuts import render, redirect
-from django.contrib import messages
 
 def repair(request):
 
     if request.method == "POST":
 
-        # ⭐ Check login FIRST
+        # Check login FIRST
         if not request.user.is_authenticated:
             return redirect("/login/")
 
