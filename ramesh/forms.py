@@ -22,6 +22,8 @@ class RegisterForm(UserCreationForm):
         
 
 class OrderUpdateForm(forms.ModelForm):
+    quantity = forms.IntegerField(min_value=1, max_value=1000)
+
     class Meta:
         model = Order
         fields = ['quantity']        

@@ -81,19 +81,23 @@ def contact(request):
     return render(request, 'contact.html')
 
 
+@login_required
 def repair(request):
 
     if request.method == "POST":
+        name = request.POST.get("name", "").strip()
+        mobile = request.POST.get("mobile", "").strip()
+        email = request.POST.get("email", "").strip()
+        city = request.POST.get("city", "").strip()
+        description = request.POST.get("description", "").strip()
 
-        # Check login FIRST
-        if not request.user.is_authenticated:
-            return redirect("/login/")
+        if not all([name, mobile, email, city, description]):
+            messages.error(request, "All fields are required. Please fill them out.")
+            return redirect("repair")
 
-        name = request.POST.get("name")
-        mobile = request.POST.get("mobile")
-        email = request.POST.get("email")
-        city = request.POST.get("city")
-        description = request.POST.get("description")
+        if not re.match(r"^[0-9]{10,15}$", mobile):
+            messages.error(request, "Please provide a valid mobile number.")
+            return redirect("repair")
 
         Repair.objects.create(
             user=request.user,
@@ -134,10 +138,10 @@ def order(request):
 
         try:
             quantity = int(request.POST.get("quantity"))
-            if quantity <= 0:
+            if quantity <= 0 or quantity > 1000:
                 raise ValueError
         except:
-            messages.error(request, "Quantity must be a valid positive number.")
+            messages.error(request, "Quantity must be a valid positive number up to 1000.")
             return redirect("/order/?product_id=" + product_id)
 
         if not re.match("^[A-Za-z ]+$", name):
@@ -189,21 +193,21 @@ def profile(request):
 
 @login_required
 def delete_order(request, id):
-    order = Order.objects.get(id=id, user=request.user)
+    order = get_object_or_404(Order, id=id, user=request.user)
     order.delete()
     return redirect('profile')
 
 
 @login_required
 def delete_repair(request, id):
-    repair = Repair.objects.get(id=id, user=request.user)
+    repair = get_object_or_404(Repair, id=id, user=request.user)
     repair.delete()
     return redirect('profile')
 
-
+@login_required
 def update_order(request, id):
 
-    order = get_object_or_404(Order, id=id)
+    order = get_object_or_404(Order, id=id, user=request.user)
 
     if request.method == "POST":
         form = OrderUpdateForm(request.POST, instance=order)
