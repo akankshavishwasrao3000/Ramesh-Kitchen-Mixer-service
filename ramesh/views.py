@@ -1,21 +1,11 @@
 import re
-from unicodedata import name
-from django.shortcuts import render  ,redirect , get_object_or_404
-from matplotlib.style import context
-from requests import request 
-from ramesh.models import Repair
-from datetime import datetime
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from ramesh.models import Order
-from django.shortcuts import redirect
-from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm
-from .forms import RegisterForm
 from django.contrib.auth.decorators import login_required
-from .models import Repair
+from .forms import RegisterForm, OrderUpdateForm
 from .models import Order, Repair, Profile
-from .forms import OrderUpdateForm
 
 
 # Signup View
