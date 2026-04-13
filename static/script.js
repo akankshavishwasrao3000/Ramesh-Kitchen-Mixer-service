@@ -1,97 +1,92 @@
+// Simple rule-based chatbot for Ramesh Kitchen Mixer
 function toggleChat() {
-    let chat = document.getElementById("chatbox");
-    if (chat.style.display === "none" || chat.style.display === "") {
-        chat.style.display = "block";
-    } else {
-        chat.style.display = "none";
-    }
+    const chatbox = document.getElementById('chatbox');
+    chatbox.style.display = chatbox.style.display === 'none' ? 'block' : 'none';
 }
 
 function handleKey(event) {
-    if (event.key === "Enter") {
+    if (event.key === 'Enter') {
         sendMessage();
     }
 }
 
 function sendMessage() {
-    let inputBox = document.getElementById("userinput");
-    let rawInput = inputBox.value;
-    let input = rawInput.toLowerCase().trim();
+    const userInput = document.getElementById('userinput');
+    const message = userInput.value.trim().toLowerCase();
+    if (message === '') return;
 
-    if (input === "") return;
+    // Add user message to chat
+    addMessage('You: ' + userInput.value);
 
-    appendMessage("You", rawInput);
-    inputBox.value = "";
+    // Process the message
+    const response = getBotResponse(message);
+    addMessage('Bot: ' + response);
 
-    setTimeout(() => {
-        let reply = generateAIResponse(input);
-        appendMessage("🤖 AI", reply);
-    }, 400); // Small delay feels more realistic
+    // Clear input
+    userInput.value = '';
 }
 
-function appendMessage(sender, text) {
-    let chat = document.getElementById("chatmessages");
-    let isUser = sender === "You";
-
-    // Clean UI for Chat Bubbles
-    let align = isUser ? "text-align: right;" : "text-align: left;";
-    let color = isUser ? "background-color: #007bff; color: white;" : "background-color: #f1f1f1; color: black;";
-
-    chat.innerHTML += `
-        <div style="margin-bottom: 15px; ${align}">
-            <div style="display: inline-block; padding: 10px 14px; border-radius: 15px; max-width: 85%; ${color} text-align: left; box-shadow: 0 1px 3px rgba(0,0,0,0.1); line-height: 1.5;">
-                <span style="font-size: 0.8em; opacity: 0.8; display: block; margin-bottom: 3px;">${sender}</span>
-                ${text}
-            </div>
-        </div>
-    `;
-
-    // Auto Scroll to bottom
-    chat.scrollTop = chat.scrollHeight;
+function addMessage(text) {
+    const chatMessages = document.getElementById('chatmessages');
+    const messageDiv = document.createElement('div');
+    messageDiv.innerHTML = text.replace(/\n/g, '<br>');
+    chatMessages.appendChild(messageDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
-function generateAIResponse(input) {
-    // 1. Greeting System
-    if (input === "hi" || input === "hello" || input === "hey") {
-        return "Hello there! 👋 I am your AI Assistant. I can help you with:<br>• 💰 <b>Price</b> / Cost<br>• 🛒 <b>Order</b> / Buy<br>• 🔧 <b>Repair</b> / Service<br>• 🛡️ <b>Warranty</b><br>• 📍 <b>Location</b><br><br>What would you like to know?";
+function getBotResponse(message) {
+    // 1. Check for greetings FIRST
+    const greetings = ['hi', 'hello', 'hey', 'good morning', 'good evening', 'good afternoon'];
+    for (let greeting of greetings) {
+        if (message.startsWith(greeting) || message === greeting) {
+            return `Hello 👋 Welcome to Ramesh Kitchen Mixer!<br>
+I am your AI assistant 😊<br><br>
+You can ask me:<br>
+• Product price 💰<br>
+• How to order 🛒<br>
+• Repair service 🔧<br>
+• Warranty 📄<br>
+• Shop location 📍`;
+        }
     }
 
-    // 2. Smart Responses
-    if (input.includes("price") || input.includes("cost")) {
-        return "💰 <b>Mixer Pricing:</b><br>Our premium kitchen mixers range from <b>₹3500 to ₹4550</b>.<br>You can see the exact features and pricing on our <a href='/products' style='color:inherit;text-decoration:underline;'>Products page</a>.";
+    // 2. Check for known queries
+    if (message.includes('price')) {
+        return 'Our kitchen mixers start from ₹1500. For specific models, please visit our products page! 💰';
+    }
+    if (message.includes('order')) {
+        return 'To order, visit our products page, select your mixer, and click "Add to Cart". We deliver within 2-3 days! 🛒';
+    }
+    if (message.includes('repair')) {
+        return 'For repairs, contact us at +91-9876543210 or visit our service center. We offer doorstep service! 🔧';
+    }
+    if (message.includes('warranty')) {
+        return 'All our products come with 1-year warranty. Register your product online for extended coverage! 📄';
+    }
+    if (message.includes('location')) {
+        return 'We are located at 123 Main Street, City Center. Open 9 AM to 9 PM daily! 📍';
     }
 
-    if (input.includes("order") || input.includes("buy")) {
-        return "🛒 <b>How to Order:</b><br>Ordering is easy! Just follow these steps:<br>1️⃣ Go to the <a href='/products' style='color:inherit;text-decoration:underline;'>Products page</a>.<br>2️⃣ Select the mixer you like.<br>3️⃣ Click <b>Order Now (Website)</b> to buy online.<br>4️⃣ Or click <b>Order on WhatsApp</b> to chat directly with us!";
+    // 3. Check for thanks or bye
+    if (message.includes('thank') || message.includes('bye')) {
+        return 'You\'re welcome! 😊 Have a great day!';
     }
 
-    if (input.includes("repair") || input.includes("service")) {
-        return "🔧 <b>Repair Service:</b><br>We provide expert repair services for all kitchen mixers. Please fill out our repair request online by visiting the <a href='/repair' style='color:inherit;text-decoration:underline;'>Book Repair page</a>, and our technician will assist you.";
+    // 4. Fallback for short or random messages
+    if (message.length < 2 || !/[a-zA-Z]/.test(message)) {
+        return `Sorry 😅 I didn’t understand that.<br>
+Please type something like:<br>
+price, order, repair, warranty, location`;
     }
 
-    if (input.includes("warranty") || input.includes("guarantee")) {
-        return "🛡️ <b>Warranty Info:</b><br>Every original Ramesh Kitchen Mixer comes with a solid <b>24-Month Warranty</b> covering all manufacturing defects and motor issues!";
-    }
-
-    if (input.includes("location") || input.includes("address")) {
-        return "📍 <b>Our Location:</b><br>Our main workshop is located in <b>Belhe, Tal: Junnar, Dist: Pune (Maharashtra 412410)</b>. You can visit us during business hours!";
-    }
-
-    if (input.includes("help") || input.includes("support")) {
-        return "I am here to help! 🤖 You can ask me about:<br>• Price<br>• How to Order<br>• Repairs<br>• Warranty<br>• Location";
-    }
-
-    // 3. Conversation Handling
-    if (input.includes("thank you") || input.includes("thanks")) {
-        return "You're very welcome! 😊 Let me know if you need anything else.";
-    }
-
-    if (input.includes("bye") || input.includes("goodbye")) {
-        return "Goodbye! 👋 Thanks for visiting Ramesh Kitchen Mixers. Have a wonderful day!";
-    }
-
-    // 4. Error Handling
-    return "Sorry, I didn't quite understand that. 🤔<br>Please type a clear keyword like <b>price</b>, <b>order</b>, <b>repair</b>, <b>warranty</b>, or <b>location</b>.";
+    // 5. Default response
+    return `I'm here to help! 😊<br>
+Ask me about:<br>
+• Product price 💰<br>
+• How to order 🛒<br>
+• Repair service 🔧<br>
+• Warranty 📄<br>
+• Shop location 📍`;
 }
 
 // Services page scroll animations
