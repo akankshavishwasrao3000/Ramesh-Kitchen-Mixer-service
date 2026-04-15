@@ -298,6 +298,19 @@ python-dotenv==0.x
 
 Private project for Ramesh Kitchen Mixer business.
 
+## ⚠️ Important Notice
+
+This project **"Ramesh Kitchen Mixer Service"** is developed by **Akanksha Ramesh Vishwasrao**.
+
+This project is licensed under the MIT License.  
+You are free to use, modify, and distribute this project.
+
+However:
+- Proper credit must be given to the original developer
+- Do not claim this project as your own work
+
+Thank you for respecting the work and supporting open-source learning 🙌
+
 ## 👨‍💼 Author
 
 Author
