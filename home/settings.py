@@ -17,6 +17,9 @@ import os
 
 load_dotenv()
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://ramesh-kitchen-mixer-service-production.up.railway.app'
+]
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
