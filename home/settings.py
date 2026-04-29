@@ -36,7 +36,9 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = [
-    'ramesh-kitchen-mixer-service-production.up.railway.app'
+    'ramesh-kitchen-mixer-service-production.up.railway.app',
+    '127.0.0.1',
+    'localhost'
 ]
 
 
