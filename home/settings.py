@@ -111,22 +111,19 @@ WSGI_APPLICATION = 'home.wsgi.application'
 import dj_database_url
 import os
 
-DATABASE_URL = os.getenv("DATABASE_URL", "")
+DATABASE_URL = os.getenv("DATABASE_URL")
+
 if DATABASE_URL:
     DATABASES = {
-        'default': dj_database_url.config()
+        'default': dj_database_url.parse(DATABASE_URL)
     }
 else:
-    # Remove the empty DATABASE_URL from the environment so dj_database_url
-    # actually uses the default value instead of trying to parse an empty string
-    os.environ.pop("DATABASE_URL", None)
     DATABASES = {
-        'default': dj_database_url.config(
-            default='sqlite:///db.sqlite3'
-        )
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-
-    
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
