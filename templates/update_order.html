@@ -3,11 +3,11 @@
 {% block content %}
 
 <div class="container mt-5">
-
-<h3>Update Order</h3>
-
-<form method="POST">
-{% csrf_token %}
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <h3>Update Order</h3>
+      <form method="POST">
+      {% csrf_token %}
 
 <div class="mb-3">
 {{ form.quantity.label }}
@@ -20,6 +20,8 @@ Update Order
 
 </form>
 
+    </div>
+  </div>
 </div>
 
 {% endblock %}

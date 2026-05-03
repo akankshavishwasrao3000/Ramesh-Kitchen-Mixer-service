@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from .forms import RegisterForm, OrderUpdateForm
 from .models import Order, Repair, Profile
 
@@ -23,6 +24,8 @@ def signup_view(request):
 
 # Login View
 def login_view(request):
+    next_url = request.GET.get('next') or request.POST.get('next')
+
     if request.method == "POST":
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
@@ -31,10 +34,14 @@ def login_view(request):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
+                if next_url:
+                    return redirect(next_url)
                 return redirect("index")   # your main page
+        else:
+            messages.error(request, "Account not found. Please sign up first.")
     else:
         form = AuthenticationForm()
-    return render(request, "login.html", {"form": form})
+    return render(request, "login.html", {"form": form, "next": next_url})
 
 
 # Logout View
@@ -61,13 +68,10 @@ def products(request):
 
 
 def services(request):
-   
-   return render(request, 'services.html')
-   
-   return render(request, 'services.html')
+    return render(request, 'services.html')
+
 
 def contact(request):
-
     return render(request, 'contact.html')
 
 
@@ -120,7 +124,10 @@ def order(request):
     if product_id:
         product = products.get(product_id)
 
-    if request.method == "POST" and product:
+    if request.method == "POST":
+        if not product:
+            messages.error(request, "Please choose a valid product before placing your order.")
+            return redirect("products")
 
         name = request.POST.get("name")
         phone = request.POST.get("phone")
@@ -130,17 +137,17 @@ def order(request):
             quantity = int(request.POST.get("quantity"))
             if quantity <= 0 or quantity > 1000:
                 raise ValueError
-        except:
+        except ValueError:
             messages.error(request, "Quantity must be a valid positive number up to 1000.")
-            return redirect("/order/?product_id=" + product_id)
+            return redirect(f"/order/?product_id={product_id}")
 
         if not re.match("^[A-Za-z ]+$", name):
             messages.error(request, "Name should contain only letters.")
-            return redirect("/order/?product_id=" + product_id)
+            return redirect(f"/order/?product_id={product_id}")
 
         if not re.match("^[0-9]{10}$", phone):
             messages.error(request, "Phone number must be exactly 10 digits.")
-            return redirect("/order/?product_id=" + product_id)
+            return redirect(f"/order/?product_id={product_id}")
 
         price = product["price"]
         total = price * quantity
@@ -157,7 +164,7 @@ def order(request):
         )
 
         messages.success(request, "Your order has been submitted successfully!")
-        return redirect("/order/?product_id=" + product_id)
+        return redirect(f"/order/?product_id={product_id}")
 
     context = {
         "product_name": product["name"] if product else "",
@@ -213,6 +220,61 @@ def update_order(request, id):
 
     return render(request, 'update_order.html', {'form': form})
 
+@login_required(login_url='login')
+def dashboard_view(request):
+    if not (request.user.is_staff or request.user.is_superuser):
+        messages.error(request, "You are not authorized to access this page.")
+        return redirect('index')
+
+    users = User.objects.order_by('username')
+    repair_count = Repair.objects.count()
+    recent_repairs = Repair.objects.order_by('-created_at')[:5]
+
+    return render(request, 'dashboard.html', {
+        'users': users,
+        'repair_count': repair_count,
+        'recent_repairs': recent_repairs,
+    })
+
+@login_required(login_url='login')
+def user_detail_view(request, id):
+    if not (request.user.is_staff or request.user.is_superuser):
+        messages.error(request, "You are not authorized to access this page.")
+        return redirect('index')
+
+    user_obj = get_object_or_404(User, id=id)
+    orders = Order.objects.filter(user=user_obj).order_by('-created_at')
+    repairs = Repair.objects.filter(user=user_obj).order_by('-created_at')
+    full_name = f"{user_obj.first_name} {user_obj.last_name}".strip() or user_obj.username
+
+    return render(request, 'user_detail.html', {
+        'user_obj': user_obj,
+        'full_name': full_name,
+        'orders': orders,
+        'repairs': repairs,
+    })
+
+@login_required(login_url='login')
+def update_order_status(request, id):
+    if not (request.user.is_staff or request.user.is_superuser):
+        messages.error(request, "You are not authorized to access this page.")
+        return redirect('index')
+
+    order = get_object_or_404(Order, id=id)
+
+    if request.method == 'POST':
+        status = request.POST.get('order_status')
+        if status in dict(Order.STATUS_CHOICES).keys():
+            order.order_status = status
+            order.save()
+
+    referer = request.META.get('HTTP_REFERER')
+    if referer:
+        return redirect(referer)
+    if order.user_id:
+        return redirect('user_detail', id=order.user_id)
+    return redirect('dashboard')
+
 @login_required
 def upload_profile_image(request):
     if request.method == 'POST':
@@ -224,4 +286,4 @@ def upload_profile_image(request):
                 messages.success(request, "Profile created and image uploaded successfully!")
             else:
                 messages.success(request, "Profile image updated successfully!")
-        return redirect('profile')
+    return redirect('profile')

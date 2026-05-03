@@ -10,7 +10,7 @@ admin.site.register(Repair, RepairAdmin)
 # Register your models here.
 
 class OrderAdmin(admin.ModelAdmin):
-      list_display = ( 'product_name', 'name', 'phone', 'address', 'price', 'quantity', 'total', 'created_at')
+      list_display = ( 'product_name', 'name', 'phone', 'address', 'price', 'quantity', 'total', 'order_status', 'delivery_days', 'created_at')
 admin.site.register(Order, OrderAdmin)
 
 

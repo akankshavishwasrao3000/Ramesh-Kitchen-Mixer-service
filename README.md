@@ -1,315 +1,238 @@
-# Ramesh Kitchen Mixer – E-Commerce & Service Platform
+# 🍳 Ramesh Kitchen Mixer Service
 
-A full-stack web application built with Django that allows customers to explore kitchen mixers, place orders, and book repair services online. The platform also includes user authentication, a customer profile dashboard, and a simple chatbot to assist users with common questions about products and services.
+A deployed Django business application for a kitchen mixer brand that combines product ordering, repair booking, customer support, and operations management in one platform.
 
-## 📚 Table of Contents
+This project is built to solve a real business need: local appliance retailers need a digital storefront and service workflow to modernize orders, repair requests, and customer communication.
 
-- Project Overview
-- Key Features
-- Technologies & Stack
-- Database Models
-- CRUD Operations
-- Project Structure
-- URL Routes
-- Security Features
-- Getting Started
-- Usage Instructions
-- Dependencies
-- Future Improvements
-- Contact
-- Author
-## 🎯 Project Overview
+---
 
-Ramesh Kitchen Mixer is a complete e-commerce and service platform that enables customers to:
-- Browse and purchase kitchen mixers online
-- Book mixer repair services
-- Track their orders and repair requests
-- Manage their account profile
-- Access product information and customer support via AI chatbot
+## 🔥 Strong Project Introduction
 
-**Live Site**: [rameshservices.pythonanywhere.com](http://rameshservices.pythonanywhere.com)
+Ramesh Kitchen Mixer Service replaces manual order ledgers and paper-based repair requests with a digital retail and support experience.
 
-## ✨ Key Features
+Customers can browse mixer models, place authenticated orders, and submit repair requests, while store staff can monitor users, manage orders, and update delivery status through a custom dashboard.
 
-### Authentication & Account Management
-- User registration with email and password
-- Secure login/logout functionality
-- User profile dashboard
-- Django admin panel for business operations
+This is a genuine deployed business application with Railway hosting and production-ready deployment settings.
 
-### E-Commerce Features
-- Product catalog with 4 mixer models
-- Dynamic order placement with quantity selection
-- Price calculation and total amount display
-- Direct WhatsApp Ordering integration (Storefront & Checkout)
-- Order history and management
-- Order cancellation capability
+---
 
+## ⚡ Key Highlights
 
-### Service Booking
-- Repair request form with customer details
-- Problem description capturing
-- Repair request history tracking
-- Request cancellation option
+- Live deployment on Railway
+- PostgreSQL-ready production database support
+- Custom staff dashboard for user and order management
+- Local chatbot assistant from `static/script.js`
+- Protected user profile showing orders and repairs
+- WhiteNoise static file delivery and secure production settings
 
-### Customer Support
-- AI-powered chatbot with keyword-based responses
-- Answers about pricing, ordering, repairs, warranty, location
-- Floating chat widget on all pages
-- Persistent chat message history
+---
 
-### Frontend
-- Responsive Bootstrap 5 design
-- Product image carousel
-- User-friendly forms with validation
-- Mobile-optimized navigation
-- Professional branding and styling
+## 🧠 Complete Project Flow
 
-## 🛠 Technologies & Stack
+### Customer flow
 
-### Backend
-- **Framework**: Django 4.2
-- **Language**: Python 3.8+
-- **Database**: MySQL
-- **Environment**: python-dotenv
+1. Visitor reaches the homepage and navigates to products, repair, services, or contact pages.
+2. User signs up or logs in with Django authentication.
+3. From `products.html`, the customer selects a mixer and is routed to `/order/?product_id=<id>`.
+4. The order page shows hard-coded product pricing and calculates the total dynamically.
+5. The user submits name, phone, address, and quantity.
+6. The app validates input, saves the order in the `Order` model, and redirects back to the order page.
+7. Logged-in users can view orders and repairs on `profile.html`, update quantity, cancel orders, upload a profile image, or delete repair entries.
 
-### Frontend
-- **CSS Framework**: Bootstrap 5.3.2
-- **JavaScript**: Vanilla JavaScript
-- **Icons**: Bootstrap Icons
-- **CDN**: jsDelivr
+### Repair flow
 
-### Deployment
-- **Host**: PythonAnywhere
-- **Database**: MySQL (remote)
-- **Web Server**: PythonAnywhere WSGI
+1. Authenticated user visits `/repair/`.
+2. The repair form collects name, mobile, email, city, and issue description.
+3. Valid repair requests are stored in the `Repair` model.
+4. Repair records appear on the profile page for tracking and cleanup.
 
-## 🗄️ Database Models
+### Admin flow
 
-### Repair Model
-- name, email, mobile, city, description
-- created_at timestamp
-- Link to User account
+1. Staff or superuser accesses `/dashboard/`.
+2. The dashboard lists all registered users.
+3. Admin views a specific user’s orders at `/dashboard/user/<id>/`.
+4. Admin updates an order’s status using `Order.STATUS_CHOICES` and persists the change.
+5. The updated status is visible in the user’s order history and profile.
 
-### Order Model
-- product_name, name, phone, address
-- price, quantity, total
-- created_at timestamp
-- Link to User account
+---
 
-## 🚀 Getting Started
+## ✨ Features (Based on Code)
 
-### Installation
+### Customer features
 
-1. Clone or download the project:
-   ```bash
-   cd Djangoharry/home
-   ```
+- Signup and login pages with secure authentication
+- Authenticated profile page with personal order and repair history
+- Profile image upload using `Profile` model
+- Order placement with product selection, quantity validation, and total price calculation
+- Repair request submission with validation and persistent storage
 
-2. Create virtual environment:
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
+### Order and repair management
 
-3. Install dependencies:
-   ```bash
-   pip install django==4.2
-   pip install mysqlclient  # or mysql-connector-python
-   pip install python-dotenv
-   ```
+- `Order` model includes product name, price, quantity, total, status, and delivery estimate
+- Default order status is `Processing`
+- Users can update order quantity and cancel orders from their profile
+- Repair requests can be created and removed by customers
 
-4. Create `.env` file in project root:
-   ```
-   SECRET_KEY=your-secret-key-here
-   DEBUG=True
-   DB_NAME=your_database_name
-   DB_USER=your_db_user
-   DB_PASSWORD=your_db_password
-   ```
+### Admin capabilities
 
-5. Run migrations:
-   ```bash
-   python manage.py migrate
-   ```
+- Staff-only dashboard for listing all users
+- User detail page showing orders and status update form
+- Order status update workflow using dashboard forms
+- Admin access protection via `is_staff` / `is_superuser`
 
-6. Create superuser (for admin panel):
-   ```bash
-   python manage.py createsuperuser
-   ```
+### Chatbot and support
 
-7. Start development server:
-   ```bash
-   python manage.py runserver
-   ```
+- Local chatbot UI integrated in `templates/base.html`
+- Rule-based responses for orders, delivery, repairs, payment options, and contact
+- Real-time chat interface implemented in `static/script.js`
 
-Access the application at `http://127.0.0.1:8000/`
+---
 
-## 📝 Usage Instructions
+## 🏗️ System Architecture
 
-### For Customers
+- **Frontend:** Django templates + Bootstrap 5 + custom CSS/JavaScript
+- **Backend:** Django views, forms, models, auth, and messaging
+- **Models:** `Order`, `Repair`, `Profile` linked to Django `User`
+- **Database:** PostgreSQL via `DATABASE_URL`; SQLite fallback for local development
+- **Deployment:** Railway-ready with environment variables and WhiteNoise static serving
 
-1. **Create Account**: Click "Sign Up" and fill in your details
-2. **Login**: Enter your credentials
-3. **Browse Products**: View mixer catalog on Products page
-4. **Place Order**: Click "Order Now" on desired mixer, confirm details
-5. **Book Repair**: Go to "Book Repair", describe your issue
-6. **Manage Account**: Visit Profile to view orders and repair requests
-7. **Use Chatbot**: Click the blue chat icon for instant customer support
+---
 
-### For Admin
+## 🛠️ Tech Stack
 
-1. Access admin panel at `/admin/`
-2. View all orders and repair requests
-3. Monitor customer data
-4. Manage product information
+| Technology | Purpose |
+| --- | --- |
+| Django 4.2 | Web application framework |
+| Python | Backend logic |
+| PostgreSQL | Production database support |
+| SQLite | Local development fallback |
+| Bootstrap 5 | Responsive UI styling |
+| WhiteNoise | Static asset delivery |
+| Railway | Deployment platform |
+| python-dotenv | Environment configuration |
 
-## � CRUD Operations
-
-### Create (C)
-- **User Registration**: New users can sign up with email and password
-- **Place Orders**: Authenticated users can create new orders for kitchen mixers
-  - Route: `/order/`
-  - Requires: Product selection, quantity, delivery address, phone number
-  - Validation: Name (letters only), Phone (10 digits)
-- **Book Repair Services**: Users can create repair requests with problem details
-  - Route: `/repair/`
-  - Requires: Name, email, mobile, city, problem description
-  - Auto-timestamps requests
-
-### Read (R)
-- **View Orders**: Users can view all their placed orders in profile
-  - Route: `/profile/`
-  - Displays: Product name, quantity, price, total, order date
-- **View Repair Requests**: Users can see all their repair requests with details
-  - Route: `/profile/`
-  - Displays: Customer info, problem description, request date
-- **Browse Products**: Public access to view all available mixer models
-  - Route: `/products/`
-- **View Services & Contact Info**: Public access to service details and support information
-
-### Update (U)
-- **Update Orders**: Users can update the quantity of their submitted mixer orders dynamically from the database.
-  - Route: `/update-order/<id>/`
-  - Validates boundaries securely.
-
-### Delete (D)
-- **Cancel Orders**: Users can delete their orders from profile
-  - Route: `/delete-order/<id>/`
-  - Only order owner can delete
-  - Cascades with user account deletion
-- **Cancel Repair Requests**: Users can delete their repair requests
-  - Route: `/delete-repair/<id>/`
-  - Only request owner can delete
-  - Cascades with user account deletion
-
-## �📁 Project Structure
-
-```
-home/
-├── manage.py                 # Django management script
-├── home/                     # Project settings
-│   ├── settings.py          # Configuration
-│   ├── urls.py              # Main URL router
-│   └── wsgi.py              # Production server
-├── ramesh/                  # Main application
-│   ├── models.py            # Database models
-│   ├── views.py             # View logic
-│   ├── forms.py             # Registration form
-│   ├── urls.py              # App routes
-│   ├── admin.py             # Admin config
-│   └── migrations/          # Database migrations
-├── templates/               # HTML templates (10 files)
-├── static/                  # CSS, JavaScript, images
-└── db.sqlite3              # SQLite database
-```
-
-## 🔄 URL Routes
-
-| Route | Purpose | Authentication |
-|-------|---------|-----------------|
-| `/` | Home page | Public |
-| `/products/` | Product listing | Public |
-| `/services/` | Service information | Public |
-| `/contact/` | Contact details | Public |
-| `/login/` | User login | Public |
-| `/signup/` | User registration | Public |
-| `/logout/` | User logout | Required |
-| `/order/` | Place order | Required |
-| `/repair/` | Book repair | Required |
-| `/profile/` | User dashboard | Required |
-| `/admin/` | Admin panel | Staff |
+---
 
 ## 🔐 Security Features
 
-- CSRF protection enabled across all active endpoints
-- Insecure Direct Object Reference (IDOR) zero-trust prevention logic for database interactions
-- Hardened database integer boundary constraints resolving native 500 crashes
-- Unhandled Exception routing safely translating queries into strict 404 pages instead of 500 errors
-- Password validation and hashing
-- Environment-based configuration for secrets
-- User authentication decorators (`@login_required`) actively blocking unauthorized flow data drops
-- Strict Per-user data access control (`get_object_or_404(..., user=request.user)`)
+- Environment-based `SECRET_KEY` management
+- Production-ready `DEBUG=False` support
+- `SECURE_SSL_REDIRECT` when not in debug mode
+- `CSRF_COOKIE_SECURE` and `SESSION_COOKIE_SECURE` enabled in production
+- HSTS enforcement via `SECURE_HSTS_SECONDS`
+- `SECURE_CONTENT_TYPE_NOSNIFF` enabled
+- `X_FRAME_OPTIONS = 'DENY'`
+- `CSRF_TRUSTED_ORIGINS` loaded from environment variables
 
-## 🎨 Features Detail
+> No secrets, credentials, or passwords are exposed in this repository.
 
-### Order System
-- Select mixer model and quantity
-- View real-time total price calculation
-- Validation: Name (letters only), Phone (10 digits)
-- Order confirmation and history tracking
+---
 
-### Repair System
-- Multi-field repair request form
-- Problem description capture
-- City and contact information
-- Automated timestamp recording
+## ⚙️ Installation Guide
 
-### User Profile
-- View all placed orders with details
-- View all repair requests
-- Cancel orders and repair requests
-- Personal information display
+### 1. Clone the repository
 
-## 📦 Dependencies
-
-```
-Django==4.2
-mysqlclient==2.x or mysql-connector-python==8.x
-python-dotenv==0.x
+```bash
+git clone https://github.com/akankshavishwasrao3000/Ramesh-Kitchen-Mixer-service.git
+cd home
 ```
 
-## 🐛 Known Issues & Future Improvements
+### 2. Create and activate a virtual environment
 
-- Unused imports (matplotlib, requests) can be removed
-- Products stored as dictionary - consider moving to database model
-- Consider adding payment gateway integration
-- Email notifications for orders could be implemented
-- ChatBot can be enhanced with machine learning
+```bash
+python -m venv venv
+venv\Scripts\activate
+```
 
-## 🤝 Contact & Support
+### 3. Install dependencies
 
-- **Phone**: +91 9921071945
-- **WhatsApp**: Chat directly
-- **Instagram**: @ramesh_kitchen_mixer
-- **Location**: Belhe, Tal: Junnar, Dist: Pune
+```bash
+pip install -r requirements.txt
+```
 
-## 📄 License
+### 4. Configure environment variables
 
-This project is licensed under the MIT License.
+Create a `.env` file at the project root:
 
-## 👨‍💼 Author
+```env
+SECRET_KEY=your_secret_key_here
+DEBUG=False
+DATABASE_URL=postgres://user:password@host:port/dbname
+ALLOWED_HOSTS=ramesh-kitchen-mixer-service-production.up.railway.app,127.0.0.1,localhost
+CSRF_TRUSTED_ORIGINS=https://ramesh-kitchen-mixer-service-production.up.railway.app,http://127.0.0.1:8000,http://localhost:8000
+```
 
-Author
-Akanksha Vishwasrao
-BE. Computer Engineering Student
+### 5. Run migrations
 
-## ⚠️ Important Notice
+```bash
+python manage.py migrate
+```
 
-This project **"Ramesh Kitchen Mixer Service"** is developed by **Akanksha Ramesh Vishwasrao**.
+### 6. Create a superuser
+
+```bash
+python manage.py createsuperuser
+```
+
+### 7. Start the development server
+
+```bash
+python manage.py runserver
+```
+
+Open `http://127.0.0.1:8000/`.
+
+---
+
+## 🌍 Live Demo + Repository
+
+- **Live Demo:** https://ramesh-kitchen-mixer-service-production.up.railway.app
+- **GitHub:** https://github.com/akankshavishwasrao3000/Ramesh-Kitchen-Mixer-service
+
+---
+
+## 👨‍💻 Author
+
+- **Name:** Akanksha Vishwasrao
+- **Role:** Final Year Student / Django Developer
+- **Project Type:** Real Business Application
+
+---
+
+## 🎯 What I Learned
+
+- Building a deployed Django application for a real local business
+- Securing Django deployment settings for Railway and PostgreSQL
+- Implementing authenticated order and repair workflows
+- Creating a staff dashboard for user and order operations
+- Adding a local chatbot assistant and profile image uploads
+
+---
+
+## 🚀 Future Improvements
+
+- Add payment gateway integration (Stripe / Razorpay)
+- Upgrade chatbot to AI/NLP-based support
+- Add email and SMS notifications for order and repair updates
+- Implement inventory and product catalog management
+- Add repair request tracking and technician assignment
+
+---
+
+## � License
+
+This project is available for portfolio and demonstration use. Feel free to adapt the code while keeping attribution to the original author. For commercial use, please contact the author for licensing details.
+
+---
+⚠️ Important Notice
+This project "Ramesh Kitchen Mixer Service" is developed by Akanksha Ramesh Vishwasrao.
 
 This project is licensed under the MIT License.
 
 Proper credit must be given when using or modifying this project.
 
 Please do not claim this project as your own work.
+
+## �📌 Notes
+
+This README reflects the real application code and behavior present in the repository.

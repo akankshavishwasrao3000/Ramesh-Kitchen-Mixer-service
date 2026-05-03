@@ -12,26 +12,63 @@ function handleKey(event) {
 
 function sendMessage() {
     const userInput = document.getElementById('userinput');
-    const message = userInput.value.trim().toLowerCase();
-    if (message === '') return;
+    const rawText = userInput.value.trim();
+    if (rawText === '') return;
 
-    // Add user message to chat
-    addMessage('You: ' + userInput.value);
+    const message = rawText.toLowerCase();
 
-    // Process the message
-    const response = getBotResponse(message);
-    addMessage('Bot: ' + response);
-
-    // Clear input
+    addUserMessage(rawText);
     userInput.value = '';
+    showTypingIndicator();
+
+    setTimeout(() => {
+        hideTypingIndicator();
+        const response = getBotResponse(message);
+        addBotMessage(response);
+    }, 700);
 }
 
-function addMessage(text) {
+function addUserMessage(text) {
     const chatMessages = document.getElementById('chatmessages');
     const messageDiv = document.createElement('div');
-    messageDiv.innerHTML = text.replace(/\n/g, '<br>');
+    messageDiv.className = 'message-bubble message-user';
+    messageDiv.innerHTML = `
+        <div class="message-content">${text}</div>
+        <div class="message-meta">You · ${getTimeStamp()}</div>
+    `;
     chatMessages.appendChild(messageDiv);
     chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function addBotMessage(text) {
+    const chatMessages = document.getElementById('chatmessages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'message-bubble message-bot';
+    messageDiv.innerHTML = `
+        <div class="message-content">${text}</div>
+        <div class="message-meta">Bot · ${getTimeStamp()}</div>
+    `;
+    chatMessages.appendChild(messageDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function showTypingIndicator() {
+    const indicator = document.getElementById('typingIndicator');
+    if (indicator) {
+        indicator.classList.remove('d-none');
+    }
+}
+
+function hideTypingIndicator() {
+    const indicator = document.getElementById('typingIndicator');
+    if (indicator) {
+        indicator.classList.add('d-none');
+    }
+}
+
+function getTimeStamp() {
+    const now = new Date();
+    return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
 function getBotResponse(message) {
@@ -51,19 +88,31 @@ You can ask me:<br>
     }
 
     // 2. Check for known queries
-    if (message.includes('price')) {
+    if (message.includes('price') || message.includes('cost') || message.includes('amount')) {
         return 'Our kitchen mixers start from ₹1500. For specific models, please visit our products page! 💰';
     }
-    if (message.includes('order')) {
-        return 'To order, visit our products page, select your mixer, and click "Add to Cart". We deliver within 2-3 days! 🛒';
+    if (message.includes('delivery') || message.includes('arrival') || message.includes('days') || message.includes('shipping')) {
+        return 'Delivery usually takes 3–7 days depending on your location. 🚚';
     }
-    if (message.includes('repair')) {
-        return 'For repairs, contact us at +91-9876543210 or visit our service center. We offer doorstep service! 🔧';
+    if (message.includes('track') || message.includes('tracking') || message.includes('order status') || message.includes('status')) {
+        return 'You can track your order in your profile dashboard under \'My Orders\'.';
+    }
+    if (message.includes('repair') || message.includes('request repair') || message.includes('service')) {
+        return 'Go to Repair section, fill the form, and submit your request. We will contact you shortly. 🔧';
+    }
+    if (message.includes('payment') || message.includes('methods') || message.includes('cash') || message.includes('pay')) {
+        return 'Currently, we support Cash on Delivery. 💵';
+    }
+    if (message.includes('contact') || message.includes('phone') || message.includes('reach')) {
+        return 'You can contact us through the contact form or phone number available on website. ☎️';
+    }
+    if (message.includes('order') || message.includes('buy') || message.includes('how to order')) {
+        return 'To order, visit our products page, select your mixer, and click "Add to Cart". We deliver within 2-3 days! 🛒';
     }
     if (message.includes('warranty')) {
         return 'All our products come with 1-year warranty. Register your product online for extended coverage! 📄';
     }
-    if (message.includes('location')) {
+    if (message.includes('location') || message.includes('where')) {
         return 'We are located at 123 Main Street, City Center. Open 9 AM to 9 PM daily! 📍';
     }
 
@@ -76,17 +125,11 @@ You can ask me:<br>
     if (message.length < 2 || !/[a-zA-Z]/.test(message)) {
         return `Sorry 😅 I didn’t understand that.<br>
 Please type something like:<br>
-price, order, repair, warranty, location`;
+orders, delivery, repair, or contact`;
     }
 
     // 5. Default response
-    return `I'm here to help! 😊<br>
-Ask me about:<br>
-• Product price 💰<br>
-• How to order 🛒<br>
-• Repair service 🔧<br>
-• Warranty 📄<br>
-• Shop location 📍`;
+    return `I'm sorry, I didn't understand that. Please try asking about orders, delivery, repair, or contact.`;
 }
 
 // Services page scroll animations
