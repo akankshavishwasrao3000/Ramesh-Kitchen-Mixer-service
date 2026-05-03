@@ -14,7 +14,7 @@ from django.contrib.auth.models import User
 
 if not User.objects.filter(username="father").exists():
     User.objects.create_superuser(
-        username="ramesh",
+        username="ramesh1",
         password="vishwasrao@2510GOD",
         email="ramesh2026@gmail.com"
     )
