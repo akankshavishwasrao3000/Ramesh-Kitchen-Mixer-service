@@ -176,9 +176,13 @@ def order(request):
 
 @login_required
 def profile(request):
-    orders = Order.objects.filter(user=request.user)
-    repairs = Repair.objects.filter(user=request.user)
-    profile_obj = Profile.objects.filter(user=request.user).first()
+    orders = Order.objects.filter(user=request.user).order_by('-created_at').only(
+        'product_name', 'price', 'quantity', 'total', 'order_status', 'delivery_days', 'created_at'
+    )
+    repairs = Repair.objects.filter(user=request.user).order_by('-created_at').only(
+        'name', 'email', 'mobile', 'city', 'description', 'created_at'
+    )
+    profile_obj = Profile.objects.filter(user=request.user).only('image').first()
     profile_image = profile_obj.image.url if profile_obj and profile_obj.image else None
 
     return render(request, "profile.html", {
@@ -190,16 +194,40 @@ def profile(request):
 
 @login_required
 def delete_order(request, id):
-    order = get_object_or_404(Order, id=id, user=request.user)
-    order.delete()
-    return redirect('profile')
+    order = get_object_or_404(Order, id=id)
+    
+    # Allow deletion if it's the user's own order OR if user is staff/superuser
+    if order.user == request.user or request.user.is_staff or request.user.is_superuser:
+        order.delete()
+        messages.success(request, "Order deleted successfully!")
+        
+        # Redirect based on where the deletion came from
+        if request.user.is_staff or request.user.is_superuser:
+            return redirect('dashboard')
+        else:
+            return redirect('profile')
+    else:
+        messages.error(request, "You are not authorized to delete this order.")
+        return redirect('profile')
 
 
 @login_required
 def delete_repair(request, id):
-    repair = get_object_or_404(Repair, id=id, user=request.user)
-    repair.delete()
-    return redirect('profile')
+    repair = get_object_or_404(Repair, id=id)
+    
+    # Allow deletion if it's the user's own repair OR if user is staff/superuser
+    if repair.user == request.user or request.user.is_staff or request.user.is_superuser:
+        repair.delete()
+        messages.success(request, "Repair request deleted successfully!")
+        
+        # Redirect based on where the deletion came from
+        if request.user.is_staff or request.user.is_superuser:
+            return redirect('dashboard')
+        else:
+            return redirect('profile')
+    else:
+        messages.error(request, "You are not authorized to delete this repair request.")
+        return redirect('profile')
 
 @login_required
 def update_order(request, id):
@@ -226,14 +254,18 @@ def dashboard_view(request):
         messages.error(request, "You are not authorized to access this page.")
         return redirect('index')
 
-    users = User.objects.order_by('username')
+    users = User.objects.order_by('username').only('username', 'email', 'first_name', 'last_name', 'date_joined')
     repair_count = Repair.objects.count()
-    recent_repairs = Repair.objects.order_by('-created_at')[:5]
+    recent_repairs = Repair.objects.select_related('user').only('user', 'name', 'email', 'city', 'description', 'created_at').order_by('-created_at')[:10]
+    all_orders = Order.objects.select_related('user').only('user', 'product_name', 'price', 'quantity', 'total', 'order_status', 'delivery_days', 'created_at').order_by('-created_at')[:40]
+    total_orders = Order.objects.count()
 
     return render(request, 'dashboard.html', {
         'users': users,
         'repair_count': repair_count,
         'recent_repairs': recent_repairs,
+        'all_orders': all_orders,
+        'total_orders': total_orders,
     })
 
 @login_required(login_url='login')
@@ -243,8 +275,12 @@ def user_detail_view(request, id):
         return redirect('index')
 
     user_obj = get_object_or_404(User, id=id)
-    orders = Order.objects.filter(user=user_obj).order_by('-created_at')
-    repairs = Repair.objects.filter(user=user_obj).order_by('-created_at')
+    orders = Order.objects.filter(user=user_obj).order_by('-created_at').only(
+        'product_name', 'price', 'quantity', 'total', 'order_status', 'delivery_days', 'created_at'
+    )
+    repairs = Repair.objects.filter(user=user_obj).order_by('-created_at').only(
+        'name', 'email', 'mobile', 'city', 'description', 'created_at'
+    )
     full_name = f"{user_obj.first_name} {user_obj.last_name}".strip() or user_obj.username
 
     return render(request, 'user_detail.html', {

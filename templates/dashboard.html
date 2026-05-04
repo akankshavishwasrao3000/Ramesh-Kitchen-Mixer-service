@@ -1,105 +1,585 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-12">
-            <div class="card shadow-sm border-0">
-                <div class="card-body p-4">
-                    <div class="row g-3 align-items-center mb-4">
-                        <div class="col-12 col-md">
-                            <h2 class="h4 mb-1">Admin Dashboard</h2>
-                            <p class="text-muted mb-0">Manage users and review orders from this page.</p>
-                        </div>
-                        <div class="col-12 col-md-auto text-md-end">
-                            <a href="/" class="btn btn-outline-secondary">Back to Home</a>
-                        </div>
-                    </div>
+<style>
+    :root {
+        --primary: #2C3E50;
+        --secondary: #3498DB;
+        --success: #27AE60;
+        --danger: #E74C3C;
+        --warning: #F39C12;
+        --light: #ECF0F1;
+        --border: #BDC3C7;
+    }
 
-                    <div class="row g-4 mb-4">
-                        <div class="col-12 col-lg-4">
-                            <div class="card h-100 shadow-sm border-0">
-                                <div class="card-body p-4">
-                                    <h5 class="mb-3">Repair Requests</h5>
-                                    <p class="display-6 mb-2">{{ repair_count }}</p>
-                                    <p class="text-muted mb-0">Total repair requests submitted by customers.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-lg-8">
-                            <div class="card h-100 shadow-sm border-0">
-                                <div class="card-body p-4">
-                                    <div class="d-flex justify-content-between align-items-center mb-3">
-                                        <div>
-                                            <h5 class="mb-0">Recent Repair Requests</h5>
-                                            <small class="text-muted">Last {{ recent_repairs|length }} submissions</small>
-                                        </div>
-                                    </div>
-                                    <div class="table-responsive">
-                                        <table class="table table-sm table-hover mb-0 align-middle">
-                                            <thead class="table-light">
-                                                <tr>
-                                                    <th scope="col">User</th>
-                                                    <th scope="col">Email</th>
-                                                    <th scope="col">Description</th>
-                                                    <th scope="col">Submitted</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {% for repair in recent_repairs %}
-                                                <tr>
-                                                    <td>
-                                                        {% if repair.user %}
-                                                            {{ repair.user.username }}
-                                                        {% else %}
-                                                            {{ repair.name }}
-                                                        {% endif %}
-                                                    </td>
-                                                    <td>{{ repair.email|default:'—' }}</td>
-                                                    <td class="text-truncate" style="max-width: 260px;">{{ repair.description }}</td>
-                                                    <td>{{ repair.created_at|date:'M d, Y' }}</td>
-                                                </tr>
-                                                {% empty %}
-                                                <tr>
-                                                    <td colspan="4" class="text-center text-muted py-4">No repair requests yet.</td>
-                                                </tr>
-                                                {% endfor %}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th scope="col">Username</th>
-                                    <th scope="col">Email</th>
-                                    <th scope="col" class="text-end">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for user in users %}
-                                <tr>
-                                    <td>{{ user.username }}</td>
-                                    <td>{{ user.email|default:'—' }}</td>
-                                    <td class="text-end">
-                                        <a href="{% url 'user_detail' user.id %}" class="btn btn-success btn-sm text-nowrap px-3">View Details</a>
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="3" class="text-center text-muted py-4">No users found.</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+    .dashboard-header {
+        background: linear-gradient(135deg, var(--primary) 0%, #34495E 100%);
+        color: white;
+        padding: 30px 0;
+        margin-bottom: 40px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .dashboard-header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+        letter-spacing: 0.5px;
+    }
+
+    .dashboard-header p {
+        font-size: 1rem;
+        opacity: 0.9;
+        margin: 0;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 25px;
+        margin-bottom: 40px;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 10px;
+        padding: 25px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        border-left: 5px solid var(--secondary);
+    }
+
+    .stat-card:hover {
+        box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        transform: translateY(-5px);
+    }
+
+    .stat-card.repairs {
+        border-left-color: var(--warning);
+    }
+
+    .stat-card.orders {
+        border-left-color: var(--success);
+    }
+
+    .stat-card.users {
+        border-left-color: var(--danger);
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin: 10px 0;
+    }
+
+    .stat-label {
+        color: #7F8C8D;
+        font-size: 0.95rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 600;
+    }
+
+    .table-section {
+        background: white;
+        border-radius: 10px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 3px solid var(--secondary);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .section-title::before {
+        font-size: 1.8rem;
+    }
+
+    .section-title.repairs::before {
+        content: "🔧";
+    }
+
+    .section-title.orders::before {
+        content: "📦";
+    }
+
+    .section-title.users::before {
+        content: "👥";
+    }
+
+    .responsive-table {
+        overflow-x: auto;
+    }
+
+    .responsive-table table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0;
+    }
+
+    .responsive-table thead {
+        background-color: var(--primary);
+        color: white;
+    }
+
+    .responsive-table th {
+        padding: 16px;
+        text-align: left;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        border: none;
+    }
+
+    .responsive-table tbody tr {
+        border-bottom: 1px solid var(--light);
+        transition: all 0.3s ease;
+    }
+
+    .responsive-table tbody tr:hover {
+        background-color: #F8F9FA;
+        box-shadow: inset 4px 0 0 var(--secondary);
+    }
+
+    .responsive-table tbody tr:nth-child(even) {
+        background-color: #FAFBFC;
+    }
+
+    .responsive-table td {
+        padding: 14px 16px;
+        vertical-align: middle;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+
+    .status-processing {
+        background-color: #D6EAF8;
+        color: #1F618D;
+    }
+
+    .status-shipped {
+        background-color: #EBDEF0;
+        color: #5B2C6F;
+    }
+
+    .status-out-for-delivery {
+        background-color: #FCF3CF;
+        color: #7D6608;
+    }
+
+    .status-delivered {
+        background-color: #D5F4E6;
+        color: #0B5345;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .btn-action {
+        padding: 6px 12px;
+        border: none;
+        border-radius: 5px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-update {
+        background-color: var(--secondary);
+        color: white;
+    }
+
+    .btn-update:hover {
+        background-color: #2980B9;
+        box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+    }
+
+    .btn-delete {
+        background-color: var(--danger);
+        color: white;
+    }
+
+    .btn-delete:hover {
+        background-color: #C0392B;
+        box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+    }
+
+    .btn-view {
+        background-color: var(--success);
+        color: white;
+    }
+
+    .btn-view:hover {
+        background-color: #229954;
+        box-shadow: 0 2px 8px rgba(39, 174, 96, 0.3);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #7F8C8D;
+    }
+
+    .empty-state-icon {
+        font-size: 3rem;
+        margin-bottom: 15px;
+        opacity: 0.5;
+    }
+
+    .back-button-container {
+        margin-bottom: 20px;
+    }
+
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background-color: white;
+        color: var(--primary);
+        padding: 10px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: 600;
+        border: 2px solid var(--primary);
+        transition: all 0.3s ease;
+    }
+
+    .back-btn:hover {
+        background-color: var(--primary);
+        color: white;
+        box-shadow: 0 4px 12px rgba(44, 62, 80, 0.2);
+    }
+
+    .price-highlight {
+        color: var(--success);
+        font-weight: 700;
+        font-size: 1.05rem;
+    }
+
+    .text-truncate-custom {
+        max-width: 300px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .delete-form {
+        display: inline;
+    }
+
+    .delete-link {
+        color: var(--danger);
+        cursor: pointer;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .delete-link:hover {
+        text-decoration: underline;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .dashboard-header {
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-header h1 {
+            font-size: 1.8rem;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .table-section {
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+
+        .responsive-table {
+            font-size: 0.9rem;
+        }
+
+        .responsive-table td,
+        .responsive-table th {
+            padding: 10px 8px;
+        }
+
+        .action-buttons {
+            gap: 5px;
+        }
+
+        .btn-action {
+            padding: 5px 10px;
+            font-size: 0.75rem;
+        }
+
+        .text-truncate-custom {
+            max-width: 150px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .dashboard-header {
+            padding: 15px 0;
+            margin-bottom: 20px;
+        }
+
+        .dashboard-header h1 {
+            font-size: 1.4rem;
+        }
+
+        .responsive-table {
+            font-size: 0.8rem;
+        }
+
+        .responsive-table th {
+            padding: 10px 6px;
+            font-size: 0.75rem;
+        }
+
+        .responsive-table td {
+            padding: 8px 6px;
+        }
+
+        .section-title {
+            font-size: 1rem;
+            margin-bottom: 12px;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .btn-action {
+            width: 100%;
+            text-align: center;
+        }
+
+        .text-truncate-custom {
+            max-width: 80px;
+        }
+    }
+</style>
+
+<div class="dashboard-header">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h1>📊 Admin Dashboard</h1>
+                <p>Manage orders, repair requests, and user information</p>
             </div>
+            <a href="/" class="back-btn">← Back to Home</a>
         </div>
     </div>
+</div>
+
+<div class="container mb-5">
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+        <div class="stat-card repairs">
+            <div class="stat-label">Repair Requests</div>
+            <div class="stat-number">{{ repair_count }}</div>
+            <p style="color: #7F8C8D; margin: 0; font-size: 0.9rem;">Total pending requests</p>
+        </div>
+
+        <div class="stat-card orders">
+            <div class="stat-label">Total Orders</div>
+            <div class="stat-number">{{ total_orders }}</div>
+            <p style="color: #7F8C8D; margin: 0; font-size: 0.9rem;">All time orders</p>
+        </div>
+
+        <div class="stat-card users">
+            <div class="stat-label">Total Users</div>
+            <div class="stat-number">{{ users|length }}</div>
+            <p style="color: #7F8C8D; margin: 0; font-size: 0.9rem;">Registered customers</p>
+        </div>
+    </div>
+
+    <!-- Recent Repair Requests Section -->
+    <div class="table-section">
+        <h2 class="section-title repairs">Recent Repair Requests</h2>
+        <div class="responsive-table">
+            {% if recent_repairs %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Customer Name</th>
+                        <th>Email</th>
+                        <th>City</th>
+                        <th>Description</th>
+                        <th>Submitted Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for repair in recent_repairs %}
+                    <tr>
+                        <td>
+                            <strong>
+                                {% if repair.user %}
+                                    {{ repair.user.username }}
+                                {% else %}
+                                    {{ repair.name }}
+                                {% endif %}
+                            </strong>
+                        </td>
+                        <td>{{ repair.email|default:'—' }}</td>
+                        <td>{{ repair.city }}</td>
+                        <td class="text-truncate-custom" title="{{ repair.description }}">{{ repair.description }}</td>
+                        <td>{{ repair.created_at|date:'M d, Y' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">🔧</div>
+                <p>No repair requests yet</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- All Orders Section with Delete Option -->
+    <div class="table-section">
+        <h2 class="section-title orders">Recent Orders</h2>
+        <p style="color: #7F8C8D; margin-top: -10px; margin-bottom: 20px;">Showing the latest 40 orders for faster load.</p>
+        <div class="responsive-table">
+            {% if all_orders %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Product</th>
+                        <th>Price</th>
+                        <th>Qty</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Delivery</th>
+                        <th>Date</th>
+                        <th style="text-align: center;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in all_orders %}
+                    <tr>
+                        <td><strong>#{{ order.id }}</strong></td>
+                        <td>
+                            {% if order.user %}
+                                {{ order.user.username }}
+                            {% else %}
+                                {{ order.name }}
+                            {% endif %}
+                        </td>
+                        <td>{{ order.product_name }}</td>
+                        <td>₹{{ order.price }}</td>
+                        <td>{{ order.quantity }}</td>
+                        <td class="price-highlight">₹{{ order.total }}</td>
+                        <td>
+                            <span class="status-badge status-{{ order.order_status|lower|cut:' ' }}">
+                                {{ order.order_status }}
+                            </span>
+                        </td>
+                        <td>{{ order.delivery_days }}</td>
+                        <td>{{ order.created_at|date:'M d, Y' }}</td>
+                        <td style="text-align: center;">
+                            <div class="action-buttons">
+                                <a href="{% url 'user_detail' order.user.id %}" class="btn-action btn-view" title="View User">View</a>
+                                {% if order.order_status == "Delivered" %}
+                                <form method="post" action="{% url 'delete_order' order.id %}" class="delete-form" style="display: inline;" onsubmit="return confirm('Delete this delivered order? This action cannot be undone.');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn-action btn-delete">Delete</button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">📦</div>
+                <p>No orders found</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Users Section -->
+    <div class="table-section">
+        <h2 class="section-title users">Registered Users</h2>
+        <div class="responsive-table">
+            {% if users %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Joined Date</th>
+                        <th style="text-align: center;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td><strong>{{ user.username }}</strong></td>
+                        <td>{{ user.email|default:'—' }}</td>
+                        <td>{{ user.first_name|default:'—' }}</td>
+                        <td>{{ user.last_name|default:'—' }}</td>
+                        <td>{{ user.date_joined|date:'M d, Y' }}</td>
+                        <td style="text-align: center;">
+                            <a href="{% url 'user_detail' user.id %}" class="btn-action btn-view">View Details</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">👥</div>
+                <p>No users found</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
 </div>
 {% endblock %}

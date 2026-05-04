@@ -1,27 +1,392 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<style>
+    :root {
+        --primary: #2C3E50;
+        --secondary: #3498DB;
+        --success: #27AE60;
+        --danger: #E74C3C;
+        --warning: #F39C12;
+        --light: #ECF0F1;
+        --border: #BDC3C7;
+    }
 
-<div class="container mt-5">
-  <div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
-      <h3>Update Order</h3>
-      <form method="POST">
-      {% csrf_token %}
+    .update-order-container {
+        min-height: calc(100vh - 200px);
+        display: flex;
+        align-items: center;
+        padding: 40px 0;
+    }
 
-<div class="mb-3">
-{{ form.quantity.label }}
-{{ form.quantity }}
-</div>
+    .update-order-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        overflow: hidden;
+        max-width: 500px;
+        width: 100%;
+    }
 
-<button type="submit" class="btn btn-success">
-Update Order
-</button>
+    .update-order-header {
+        background: linear-gradient(135deg, var(--primary) 0%, #34495E 100%);
+        color: white;
+        padding: 30px;
+        text-align: center;
+    }
 
-</form>
+    .update-order-header h1 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin: 0;
+        margin-bottom: 10px;
+    }
 
+    .update-order-header p {
+        margin: 0;
+        opacity: 0.9;
+        font-size: 0.95rem;
+    }
+
+    .update-order-body {
+        padding: 40px;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-group:last-child {
+        margin-bottom: 0;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        color: var(--primary);
+        margin-bottom: 10px;
+        font-size: 0.95rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .form-group input[type="number"],
+    .form-group select {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid var(--border);
+        border-radius: 8px;
+        font-size: 1rem;
+        font-family: inherit;
+        transition: all 0.3s ease;
+        background-color: #FAFBFC;
+    }
+
+    .form-group input[type="number"]:focus,
+    .form-group select:focus {
+        outline: none;
+        border-color: var(--secondary);
+        background-color: white;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    }
+
+    .form-info {
+        background-color: var(--light);
+        border-left: 4px solid var(--secondary);
+        padding: 15px;
+        border-radius: 6px;
+        margin-bottom: 25px;
+    }
+
+    .form-info p {
+        margin: 0;
+        color: var(--primary);
+        font-size: 0.9rem;
+        line-height: 1.6;
+    }
+
+    .form-info strong {
+        font-weight: 600;
+    }
+
+    .button-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-top: 30px;
+    }
+
+    .btn-submit,
+    .btn-back {
+        padding: 14px 25px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, var(--success) 0%, #229954 100%);
+        color: white;
+    }
+
+    .btn-submit:hover {
+        box-shadow: 0 6px 16px rgba(39, 174, 96, 0.4);
+        transform: translateY(-2px);
+    }
+
+    .btn-submit:active {
+        transform: translateY(0);
+    }
+
+    .btn-back {
+        background-color: white;
+        color: var(--primary);
+        border: 2px solid var(--primary);
+    }
+
+    .btn-back:hover {
+        background-color: var(--primary);
+        color: white;
+    }
+
+    .error-message {
+        background-color: #FADBD8;
+        color: var(--danger);
+        border: 1px solid var(--danger);
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border-left: 4px solid var(--danger);
+    }
+
+    .success-message {
+        background-color: #D5F4E6;
+        color: var(--success);
+        border: 1px solid var(--success);
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border-left: 4px solid var(--success);
+    }
+
+    .order-preview {
+        background: white;
+        border: 2px solid var(--light);
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 25px;
+    }
+
+    .preview-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--light);
+    }
+
+    .preview-item:last-child {
+        border-bottom: none;
+    }
+
+    .preview-label {
+        color: #7F8C8D;
+        font-weight: 500;
+    }
+
+    .preview-value {
+        color: var(--primary);
+        font-weight: 600;
+    }
+
+    .preview-value.price {
+        color: var(--success);
+        font-size: 1.1rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .update-order-container {
+            padding: 20px;
+        }
+
+        .update-order-body {
+            padding: 25px;
+        }
+
+        .button-group {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .btn-submit,
+        .btn-back {
+            padding: 12px 20px;
+            font-size: 0.95rem;
+        }
+
+        .update-order-header {
+            padding: 25px;
+        }
+
+        .update-order-header h1 {
+            font-size: 1.5rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .update-order-container {
+            padding: 15px;
+        }
+
+        .update-order-body {
+            padding: 20px;
+        }
+
+        .update-order-header {
+            padding: 20px;
+        }
+
+        .update-order-header h1 {
+            font-size: 1.2rem;
+        }
+
+        .update-order-header p {
+            font-size: 0.85rem;
+        }
+
+        .form-group input[type="number"],
+        .form-group select {
+            padding: 11px 12px;
+            font-size: 16px; /* Prevents zoom on iOS */
+        }
+
+        .form-group label {
+            font-size: 0.85rem;
+        }
+
+        .btn-submit,
+        .btn-back {
+            padding: 11px 15px;
+            font-size: 0.9rem;
+        }
+
+        .preview-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 5px;
+        }
+    }
+</style>
+
+<div class="container update-order-container">
+    <div class="update-order-card mx-auto">
+        <div class="update-order-header">
+            <h1>📋 Update Order</h1>
+            <p>Modify your order quantity</p>
+        </div>
+
+        <div class="update-order-body">
+            {% if messages %}
+                {% for message in messages %}
+                    {% if message.tags == 'error' %}
+                        <div class="error-message">
+                            ❌ {{ message }}
+                        </div>
+                    {% elif message.tags == 'success' %}
+                        <div class="success-message">
+                            ✓ {{ message }}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="form-info">
+                    <p>💡 <strong>Instructions:</strong> Update the quantity below and click Save to apply changes. The total amount will be automatically calculated.</p>
+                </div>
+
+                {% if form.non_field_errors %}
+                    <div class="error-message">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <div class="order-preview">
+                    <div class="preview-item">
+                        <span class="preview-label">📦 Current Quantity:</span>
+                        <span class="preview-value" id="current-qty">{{ form.instance.quantity }}</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_quantity">
+                        {{ form.quantity.label|default:"New Quantity" }}
+                    </label>
+                    {{ form.quantity }}
+                    {% if form.quantity.errors %}
+                        <div class="error-message" style="margin-top: 8px;">
+                            {{ form.quantity.errors }}
+                        </div>
+                    {% endif %}
+                    <small style="display: block; margin-top: 8px; color: #7F8C8D;">
+                        Enter a positive number between 1 and 1000
+                    </small>
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="btn-submit">
+                        ✓ Save Changes
+                    </button>
+                    <a href="{% url 'profile' %}" class="btn-back">
+                        ← Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
-  </div>
 </div>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const quantityInput = document.getElementById('id_quantity');
+        if (quantityInput) {
+            quantityInput.addEventListener('input', function() {
+                const value = parseInt(this.value);
+                if (isNaN(value) || value < 1) {
+                    this.style.borderColor = '#E74C3C';
+                } else if (value > 1000) {
+                    this.style.borderColor = '#F39C12';
+                } else {
+                    this.style.borderColor = '#27AE60';
+                }
+            });
+
+            // Trigger initial validation
+            quantityInput.dispatchEvent(new Event('input'));
+        }
+
+        // Form submission confirmation
+        const form = document.querySelector('form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                const quantity = quantityInput.value;
+                if (!quantity || parseInt(quantity) < 1 || parseInt(quantity) > 1000) {
+                    e.preventDefault();
+                    alert('Please enter a valid quantity between 1 and 1000');
+                }
+            });
+        }
+    });
+</script>
 {% endblock %}

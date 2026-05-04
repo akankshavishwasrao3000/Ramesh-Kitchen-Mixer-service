@@ -1,108 +1,552 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-12">
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-body">
-                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3">
-                        <div>
-                            <h2 class="h4 mb-1">User Details</h2>
-                            <p class="mb-1"><strong>Name:</strong> {{ full_name }}</p>
-                            <p class="mb-1"><strong>Email:</strong> {{ user_obj.email|default:'—' }}</p>
-                            <p class="mb-0"><strong>Date joined:</strong> {{ user_obj.date_joined|date:'M d, Y H:i' }}</p>
-                        </div>
-                        <div class="text-end mt-3 mt-md-0">
-                            <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">Back to Dashboard</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<style>
+    :root {
+        --primary: #2C3E50;
+        --secondary: #3498DB;
+        --success: #27AE60;
+        --danger: #E74C3C;
+        --warning: #F39C12;
+        --light: #ECF0F1;
+        --border: #BDC3C7;
+    }
 
-            <div class="card shadow-sm border-0">
-                <div class="card-body">
-                    <h3 class="h5 mb-3">Orders</h3>
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover align-middle mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th scope="col">Product</th>
-                                    <th scope="col">Price</th>
-                                    <th scope="col">Quantity</th>
-                                    <th scope="col">Total</th>
-                                    <th scope="col">Status</th>
-                                    <th scope="col">Delivery Estimate</th>
-                                    <th scope="col" class="text-center">Update</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for order in orders %}
-                                <tr>
-                                    <td>{{ order.product_name }}</td>
-                                    <td>₹{{ order.price }}</td>
-                                    <td>{{ order.quantity }}</td>
-                                    <td>₹{{ order.total }}</td>
-                                    <td>{{ order.order_status }}</td>
-                                    <td>{{ order.delivery_days }}</td>
-                                    <td class="text-center">
-                                        <form method="post" action="{% url 'update_order_status' order.id %}" class="d-flex flex-column flex-sm-row gap-2 justify-content-center align-items-center">
-                                            {% csrf_token %}
-                                            <select name="order_status" class="form-select px-3 py-2" style="min-width: 180px;">
-                                                {% for value,label in order.STATUS_CHOICES %}
-                                                <option value="{{ value }}" {% if order.order_status == value %}selected{% endif %}>{{ label }}</option>
-                                                {% endfor %}
-                                            </select>
-                                            <button type="submit" class="btn btn-success btn-sm text-nowrap px-3 py-2">Update</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="7" class="text-center text-muted">This user has no orders yet.</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+    .user-detail-header {
+        background: linear-gradient(135deg, var(--primary) 0%, #34495E 100%);
+        color: white;
+        padding: 35px 0;
+        margin-bottom: 40px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
 
-            <div class="card shadow-sm border-0 mt-4">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h3 class="h5 mb-0">Repair Requests</h3>
-                        <span class="text-muted">{{ repairs|length }} total</span>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover align-middle mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th scope="col">Problem</th>
-                                    <th scope="col">Email</th>
-                                    <th scope="col">City</th>
-                                    <th scope="col">Submitted</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for repair in repairs %}
-                                <tr>
-                                    <td class="text-truncate" style="max-width: 280px;">{{ repair.description }}</td>
-                                    <td>{{ repair.email|default:'—' }}</td>
-                                    <td>{{ repair.city }}</td>
-                                    <td>{{ repair.created_at|date:'M d, Y' }}</td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="4" class="text-center text-muted">This user has no repair requests yet.</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+    .header-content {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .user-info {
+        flex: 1;
+        min-width: 300px;
+    }
+
+    .user-info h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+        letter-spacing: 0.5px;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+        opacity: 0.95;
+    }
+
+    .info-item::before {
+        font-size: 1.2rem;
+    }
+
+    .info-email::before {
+        content: "📧";
+    }
+
+    .info-joined::before {
+        content: "📅";
+    }
+
+    .header-buttons {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background-color: white;
+        color: var(--primary);
+        padding: 12px 25px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        border: 2px solid white;
+        transition: all 0.3s ease;
+    }
+
+    .back-btn:hover {
+        background-color: transparent;
+        color: white;
+        border-color: white;
+    }
+
+    .section-card {
+        background: white;
+        border-radius: 10px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+
+    .section-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 3px solid var(--secondary);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .section-title::before {
+        font-size: 1.6rem;
+        margin-right: 8px;
+    }
+
+    .section-title.orders::before {
+        content: "📦";
+    }
+
+    .section-title.repairs::before {
+        content: "🔧";
+    }
+
+    .section-count {
+        background-color: var(--secondary);
+        color: white;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    .responsive-table {
+        overflow-x: auto;
+    }
+
+    .responsive-table table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0;
+    }
+
+    .responsive-table thead {
+        background-color: var(--primary);
+        color: white;
+    }
+
+    .responsive-table th {
+        padding: 14px;
+        text-align: left;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        border: none;
+    }
+
+    .responsive-table tbody tr {
+        border-bottom: 1px solid var(--light);
+        transition: all 0.3s ease;
+    }
+
+    .responsive-table tbody tr:hover {
+        background-color: #F8F9FA;
+        box-shadow: inset 4px 0 0 var(--secondary);
+    }
+
+    .responsive-table tbody tr:nth-child(even) {
+        background-color: #FAFBFC;
+    }
+
+    .responsive-table td {
+        padding: 14px;
+        vertical-align: middle;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+
+    .status-processing {
+        background-color: #D6EAF8;
+        color: #1F618D;
+    }
+
+    .status-shipped {
+        background-color: #EBDEF0;
+        color: #5B2C6F;
+    }
+
+    .status-out-for-delivery {
+        background-color: #FCF3CF;
+        color: #7D6608;
+    }
+
+    .status-delivered {
+        background-color: #D5F4E6;
+        color: #0B5345;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .btn-action {
+        padding: 6px 12px;
+        border: none;
+        border-radius: 5px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-update {
+        background-color: var(--secondary);
+        color: white;
+    }
+
+    .btn-update:hover {
+        background-color: #2980B9;
+        box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+    }
+
+    .btn-delete {
+        background-color: var(--danger);
+        color: white;
+    }
+
+    .btn-delete:hover {
+        background-color: #C0392B;
+        box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+    }
+
+    .price-highlight {
+        color: var(--success);
+        font-weight: 700;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #7F8C8D;
+    }
+
+    .empty-state-icon {
+        font-size: 3rem;
+        margin-bottom: 15px;
+        opacity: 0.5;
+    }
+
+    .update-status-form {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .update-status-form select {
+        padding: 8px 10px;
+        border: 1px solid var(--border);
+        border-radius: 5px;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+
+    .update-status-form select:focus {
+        outline: none;
+        border-color: var(--secondary);
+        box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
+    }
+
+    .update-status-form button {
+        padding: 8px 15px;
+        background-color: var(--success);
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .update-status-form button:hover {
+        background-color: #229954;
+        box-shadow: 0 2px 8px rgba(39, 174, 96, 0.3);
+    }
+
+    .delete-form {
+        display: inline;
+    }
+
+    .text-truncate-custom {
+        max-width: 280px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .user-detail-header {
+            padding: 25px 0;
+            margin-bottom: 30px;
+        }
+
+        .user-info h1 {
+            font-size: 1.5rem;
+        }
+
+        .header-content {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .header-buttons {
+            width: 100%;
+        }
+
+        .back-btn {
+            flex: 1;
+            justify-content: center;
+        }
+
+        .section-card {
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+
+        .responsive-table {
+            font-size: 0.9rem;
+        }
+
+        .responsive-table th,
+        .responsive-table td {
+            padding: 10px 8px;
+        }
+
+        .update-status-form {
+            flex-direction: column;
+        }
+
+        .update-status-form select,
+        .update-status-form button {
+            width: 100%;
+        }
+
+        .action-buttons {
+            gap: 5px;
+        }
+
+        .btn-action {
+            padding: 5px 10px;
+            font-size: 0.75rem;
+        }
+
+        .text-truncate-custom {
+            max-width: 150px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .user-detail-header {
+            padding: 20px 0;
+            margin-bottom: 20px;
+        }
+
+        .user-info h1 {
+            font-size: 1.2rem;
+        }
+
+        .info-item {
+            font-size: 0.9rem;
+        }
+
+        .section-card {
+            padding: 15px;
+        }
+
+        .section-title {
+            font-size: 1rem;
+            margin-bottom: 12px;
+        }
+
+        .responsive-table {
+            font-size: 0.8rem;
+        }
+
+        .responsive-table th {
+            padding: 8px 5px;
+            font-size: 0.75rem;
+        }
+
+        .responsive-table td {
+            padding: 8px 5px;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .btn-action {
+            width: 100%;
+            text-align: center;
+        }
+
+        .text-truncate-custom {
+            max-width: 80px;
+        }
+
+        .section-count {
+            font-size: 0.8rem;
+            padding: 4px 10px;
+        }
+    }
+</style>
+
+<div class="user-detail-header">
+    <div class="container">
+        <div class="header-content">
+            <div class="user-info">
+                <h1>👤 {{ full_name }}</h1>
+                <div class="info-item info-email">{{ user_obj.email|default:'No email provided' }}</div>
+                <div class="info-item info-joined">{{ user_obj.date_joined|date:'M d, Y H:i' }}</div>
+            </div>
+            <div class="header-buttons">
+                <a href="{% url 'dashboard' %}" class="back-btn">← Back to Dashboard</a>
             </div>
         </div>
     </div>
 </div>
+
+<div class="container mb-5">
+    <!-- Orders Section -->
+    <div class="section-card">
+        <div class="section-title orders">
+            Orders
+            <span class="section-count">{{ orders|length }} total</span>
+        </div>
+        <div class="responsive-table">
+            {% if orders %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Price</th>
+                        <th>Qty</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Delivery</th>
+                        <th style="text-align: center;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td><strong>{{ order.product_name }}</strong></td>
+                        <td>₹{{ order.price }}</td>
+                        <td>{{ order.quantity }}</td>
+                        <td class="price-highlight">₹{{ order.total }}</td>
+                        <td>
+                            <span class="status-badge status-{{ order.order_status|lower|cut:' ' }}">
+                                {{ order.order_status }}
+                            </span>
+                        </td>
+                        <td>{{ order.delivery_days }}</td>
+                        <td style="text-align: center;">
+                            <div class="action-buttons">
+                                <form method="post" action="{% url 'update_order_status' order.id %}" class="update-status-form">
+                                    {% csrf_token %}
+                                    <select name="order_status" title="Update order status">
+                                        {% for value,label in order.STATUS_CHOICES %}
+                                        <option value="{{ value }}" {% if order.order_status == value %}selected{% endif %}>{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <button type="submit" class="btn-action btn-update" title="Update Status">✓ Update</button>
+                                </form>
+                                {% if order.order_status == "Delivered" %}
+                                <form method="post" action="{% url 'delete_order' order.id %}" class="delete-form" onsubmit="return confirm('Delete this delivered order? This cannot be undone.');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn-action btn-delete" title="Delete Order">🗑️ Delete</button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">📦</div>
+                <p>This user has no orders yet</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Repair Requests Section -->
+    <div class="section-card">
+        <div class="section-title repairs">
+            Repair Requests
+            <span class="section-count">{{ repairs|length }} total</span>
+        </div>
+        <div class="responsive-table">
+            {% if repairs %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Problem Description</th>
+                        <th>Email</th>
+                        <th>City</th>
+                        <th>Submitted</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for repair in repairs %}
+                    <tr>
+                        <td class="text-truncate-custom" title="{{ repair.description }}">{{ repair.description }}</td>
+                        <td>{{ repair.email|default:'—' }}</td>
+                        <td>{{ repair.city }}</td>
+                        <td>{{ repair.created_at|date:'M d, Y' }}</td>
+                    </tr>
+                    {% empty %}
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">🔧</div>
+                <p>This user has no repair requests yet</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
 {% endblock %}
