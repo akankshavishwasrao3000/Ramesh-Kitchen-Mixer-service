@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="bg-light py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-9 col-xl-8">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                    <div class="card-body p-4 p-md-5 bg-white">
+                        
+                        <div class="text-center mb-5 border-bottom pb-4">
+                            <h1 class="display-6 fw-bold text-dark mb-3">Shipping & Delivery Policy</h1>
+                            <p class="text-muted mb-0">
+                                <i class="far fa-calendar-alt me-2"></i>Last Updated: {% now "F j, Y" %}
+                            </p>
+                        </div>
+
+                        <div class="mb-4">
+                            <p class="lead text-secondary lh-base">
+                                <strong>Ramesh Kitchen Mixer</strong> provides local delivery for our mixers, spare parts, and induction cooktops.
+                            </p>
+                        </div>
+
+                        <div class="policy-section mb-4">
+                            <h3 class="h5 fw-bold text-dark mb-2">
+                                <i class="fas fa-truck text-success me-2"></i> 1. Local Delivery
+                            </h3>
+                            <p class="text-secondary lh-lg mb-0">
+                                As a local family business, we primarily provide products and repair services to customers in and around Belhe, Maharashtra.
+                            </p>
+                        </div>
+
+                        <div class="policy-section mb-4">
+                            <h3 class="h5 fw-bold text-dark mb-2">
+                                <i class="fas fa-shipping-fast text-success me-2"></i> 2. Delivery Timelines
+                            </h3>
+                            <p class="text-secondary lh-lg mb-0">
+                                Delivery timelines depend on your location and whether the product you ordered is currently in stock. We will let you know the estimated delivery time once your order is confirmed.
+                            </p>
+                        </div>
+
+                        <div class="policy-section mb-4">
+                            <h3 class="h5 fw-bold text-dark mb-2">
+                                <i class="fas fa-store text-success me-2"></i> 3. Store Pickup
+                            </h3>
+                            <p class="text-secondary lh-lg mb-0">
+                                In some cases, certain products or complex repair jobs may require you to pick them up directly from our local shop. We will let you know if a store pickup is necessary for your order.
+                            </p>
+                        </div>
+
+                        <div class="policy-section mb-5">
+                            <h3 class="h5 fw-bold text-dark mb-2">
+                                <i class="fas fa-box-open text-success me-2"></i> 4. Order Tracking
+                            </h3>
+                            <p class="text-secondary lh-lg mb-0">
+                                You can view the status of your product orders and repair requests at any time by logging into your profile on our website.
+                            </p>
+                        </div>
+
+                        <div class="bg-light p-4 rounded-3 text-center mt-5">
+                            <h4 class="h6 fw-bold text-dark mb-2">Questions about your delivery?</h4>
+                            <p class="text-secondary mb-3 small">Give us a call and we will be happy to help.</p>
+                            <a href="{% url 'contact' %}" class="btn btn-success px-4 py-2 fw-semibold shadow-sm">Contact Us</a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .lh-lg { line-height: 1.8 !important; }
+</style>
+{% endblock %}

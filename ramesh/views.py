@@ -74,6 +74,17 @@ def services(request):
 def contact(request):
     return render(request, 'contact.html')
 
+def privacy_policy(request):
+    return render(request, 'privacy_policy.html')
+
+def terms_conditions(request):
+    return render(request, 'terms_and_conditions.html')
+
+def refund_policy(request):
+    return render(request, 'refund_policy.html')
+
+def shipping_policy(request):
+    return render(request, 'shipping_policy.html')
 
 @login_required
 def repair(request):

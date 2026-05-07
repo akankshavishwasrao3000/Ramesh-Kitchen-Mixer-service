@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="bg-light py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-9 col-xl-8">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                    <div class="card-body p-4 p-md-5 bg-white">
+                        
+                        <div class="text-center mb-5 border-bottom pb-4">
+                            <h1 class="display-6 fw-bold text-dark mb-3">Cancellation & Refund Policy</h1>
+                            <p class="text-muted mb-0">
+                                <i class="far fa-calendar-alt me-2"></i>Last Updated: {% now "F j, Y" %}
+                            </p>
+                        </div>
+
+                        <div class="mb-4">
+                            <p class="lead text-secondary lh-base">
+                                We want to make sure you are happy with your purchase and repair services from <strong>Ramesh Kitchen Mixer</strong>. Here is how we handle cancellations and refunds.
+                            </p>
+                        </div>
+
+                        <div class="policy-section mb-4">
+                            <h3 class="h5 fw-bold text-dark mb-2">
+                                <i class="fas fa-times-circle text-danger me-2"></i> 1. Order Cancellation
+                            </h3>
+                            <p class="text-secondary lh-lg mb-0">
+                                You can cancel your orders or repair requests before they are processed or before a technician is sent out. If we have already dispatched the item or started the repair, please contact us to discuss the next steps.
+                            </p>
+                        </div>
+
+                        <div class="policy-section mb-4">
+                            <h3 class="h5 fw-bold text-dark mb-2">
+                                <i class="fas fa-search-dollar text-danger me-2"></i> 2. Refund Verification
+                            </h3>
+                            <p class="text-secondary lh-lg mb-0">
+                                Refunds are processed after a quick verification of the product or issue. We may ask you to send us a photo or bring the item to our shop so we can take a look at the problem before approving the refund.
+                            </p>
+                        </div>
+
+                        <div class="policy-section mb-4">
+                            <h3 class="h5 fw-bold text-dark mb-2">
+                                <i class="fas fa-money-check-alt text-danger me-2"></i> 3. Payment Processing Time
+                            </h3>
+                            <p class="text-secondary lh-lg mb-0">
+                                Once your refund is verified and approved, it will be processed back to your original payment method via Razorpay. Please note that it can take <strong>5 to 7 business days</strong> for the money to appear in your bank account.
+                            </p>
+                        </div>
+
+                        <div class="policy-section mb-5">
+                            <h3 class="h5 fw-bold text-dark mb-2">
+                                <i class="fas fa-cogs text-danger me-2"></i> 4. Repair Service Refunds
+                            </h3>
+                            <p class="text-secondary lh-lg mb-0">
+                                For repair services, refunds depend on whether we were able to fix the issue or if the required spare parts were available. If we cannot repair your mixer, any advance service fees paid will be appropriately refunded.
+                            </p>
+                        </div>
+
+                        <div class="bg-light p-4 rounded-3 text-center mt-5">
+                            <h4 class="h6 fw-bold text-dark mb-2">Need to request a cancellation or refund?</h4>
+                            <p class="text-secondary mb-3 small">Please call us directly or use our contact page.</p>
+                            <a href="{% url 'contact' %}" class="btn btn-danger px-4 py-2 fw-semibold shadow-sm">Contact Us</a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .lh-lg { line-height: 1.8 !important; }
+</style>
+{% endblock %}

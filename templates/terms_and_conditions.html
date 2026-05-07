@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="bg-light py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-9 col-xl-8">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                    <div class="card-body p-4 p-md-5 bg-white">
+                        
+                        <div class="text-center mb-5 border-bottom pb-4">
+                            <h1 class="display-6 fw-bold text-dark mb-3">Terms and Conditions</h1>
+                            <p class="text-muted mb-0">
+                                <i class="far fa-calendar-alt me-2"></i>Last Updated: {% now "F j, Y" %}
+                            </p>
+                        </div>
+
+                        <div class="mb-4">
+                            <p class="lead text-secondary lh-base">
+                                Welcome to <strong>Ramesh Kitchen Mixer</strong>. By using our website to purchase products or book a repair, you agree to these simple terms of service.
+                            </p>
+                        </div>
+
+                        <div class="policy-section mb-4">
+                            <h3 class="h5 fw-bold text-dark mb-2">
+                                <i class="fas fa-clipboard-check text-primary me-2"></i> 1. Accurate Information
+                            </h3>
+                            <p class="text-secondary lh-lg mb-0">
+                                Please ensure that the contact details you provide (like your phone number and address) are correct so we can easily reach you regarding your repairs and deliveries.
+                            </p>
+                        </div>
+
+                        <div class="policy-section mb-4">
+                            <h3 class="h5 fw-bold text-dark mb-2">
+                                <i class="fas fa-tools text-primary me-2"></i> 2. Repair Timelines
+                            </h3>
+                            <p class="text-secondary lh-lg mb-0">
+                                Repair timelines depend heavily on the availability of spare parts and the specific condition of your mixer. We will do our best to fix your appliance as quickly as possible and will keep you informed if there are delays.
+                            </p>
+                        </div>
+
+                        <div class="policy-section mb-4">
+                            <h3 class="h5 fw-bold text-dark mb-2">
+                                <i class="fas fa-tags text-primary me-2"></i> 3. Pricing & Payments
+                            </h3>
+                            <p class="text-secondary lh-lg mb-0">
+                                Product prices and availability may change without notice. All online payments are securely processed through Razorpay for your peace of mind. Product images shown on the website are for reference.
+                            </p>
+                        </div>
+
+                        <div class="policy-section mb-5">
+                            <h3 class="h5 fw-bold text-dark mb-2">
+                                <i class="fas fa-map-marker-alt text-primary me-2"></i> 4. Local Business Operations
+                            </h3>
+                            <p class="text-secondary lh-lg mb-0">
+                                We are a local family business based in Belhe, Maharashtra. Most of our sales, deliveries, and repair services are primarily focused on customers within our local area.
+                            </p>
+                        </div>
+
+                        <div class="bg-light p-4 rounded-3 text-center mt-5">
+                            <h4 class="h6 fw-bold text-dark mb-2">Need clarification?</h4>
+                            <p class="text-secondary mb-3 small">Customer support is provided through phone or our contact page.</p>
+                            <a href="{% url 'contact' %}" class="btn btn-primary px-4 py-2 fw-semibold shadow-sm">Contact Us</a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .lh-lg { line-height: 1.8 !important; }
+</style>
+{% endblock %}

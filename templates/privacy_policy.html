@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="bg-light py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-9 col-xl-8">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                    <div class="card-body p-4 p-md-5 bg-white">
+                        
+                        <div class="text-center mb-5 border-bottom pb-4">
+                            <h1 class="display-6 fw-bold text-dark mb-3">Privacy Policy</h1>
+                            <p class="text-muted mb-0">
+                                <i class="far fa-calendar-alt me-2"></i>Last Updated: {% now "F j, Y" %}
+                            </p>
+                        </div>
+
+                        <div class="mb-4">
+                            <p class="lead text-secondary lh-base">
+                                Welcome to <strong>Ramesh Kitchen Mixer</strong>. As a local family business, we value your trust and are committed to keeping your personal information safe.
+                            </p>
+                        </div>
+
+                        <div class="policy-section mb-4">
+                            <h3 class="h5 fw-bold text-dark mb-2">
+                                <i class="fas fa-shield-alt text-primary me-2"></i> 1. Secure Information Storage
+                            </h3>
+                            <p class="text-secondary lh-lg mb-0">
+                                When you place an order or book a repair, the contact and order details you provide are stored securely in our online database. We take standard precautions to ensure your data is kept safe and private.
+                            </p>
+                        </div>
+
+                        <div class="policy-section mb-4">
+                            <h3 class="h5 fw-bold text-dark mb-2">
+                                <i class="fas fa-bullseye text-primary me-2"></i> 2. How We Use Your Data
+                            </h3>
+                            <p class="text-secondary lh-lg mb-2">
+                                We only use your information to help provide you with our services. This includes:
+                            </p>
+                            <ul class="text-secondary lh-lg mb-0">
+                                <li>Contacting you regarding your repair bookings or product orders.</li>
+                                <li>Processing your payments securely through Razorpay.</li>
+                                <li>Arranging delivery for your mixers or spare parts.</li>
+                                <li>Providing customer support when you reach out to us.</li>
+                            </ul>
+                        </div>
+
+                        <div class="policy-section mb-4">
+                            <h3 class="h5 fw-bold text-dark mb-2">
+                                <i class="fas fa-user-lock text-primary me-2"></i> 3. We Do Not Sell Your Data
+                            </h3>
+                            <p class="text-secondary lh-lg mb-0">
+                                We respect your privacy. <strong>We do not sell or share your personal information with third parties</strong> for marketing purposes. Your details are only used by our family business to fulfill your requests.
+                            </p>
+                        </div>
+
+                        <div class="policy-section mb-5">
+                            <h3 class="h5 fw-bold text-dark mb-2">
+                                <i class="fas fa-laptop-code text-primary me-2"></i> 4. Order Management
+                            </h3>
+                            <p class="text-secondary lh-lg mb-0">
+                                Your requests are managed through our secure administrative system. Only authorized members of our business have access to this system to ensure your orders and repairs are handled properly.
+                            </p>
+                        </div>
+
+                        <div class="bg-light p-4 rounded-3 text-center mt-5">
+                            <h4 class="h6 fw-bold text-dark mb-2">Have questions about your privacy?</h4>
+                            <p class="text-secondary mb-3 small">We are always happy to help our customers.</p>
+                            <a href="{% url 'contact' %}" class="btn btn-primary px-4 py-2 fw-semibold shadow-sm">Contact Us</a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .lh-lg { line-height: 1.8 !important; }
+</style>
+{% endblock %}
