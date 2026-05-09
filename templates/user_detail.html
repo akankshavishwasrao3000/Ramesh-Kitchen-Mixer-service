@@ -460,6 +460,7 @@
                         <th>Price</th>
                         <th>Qty</th>
                         <th>Total</th>
+                        <th>Payment</th>
                         <th>Status</th>
                         <th>Delivery</th>
                         <th style="text-align: center;">Actions</th>
@@ -472,6 +473,11 @@
                         <td>₹{{ order.price }}</td>
                         <td>{{ order.quantity }}</td>
                         <td class="price-highlight">₹{{ order.total }}</td>
+                        <td>
+                            <span class="badge {% if order.payment_status == 'Paid' %}bg-success{% elif order.payment_status == 'Failed' %}bg-danger{% else %}bg-secondary{% endif %}">
+                                {{ order.payment_status }}
+                            </span>
+                        </td>
                         <td>
                             <span class="status-badge status-{{ order.order_status|lower|cut:' ' }}">
                                 {{ order.order_status }}

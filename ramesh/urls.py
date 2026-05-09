@@ -19,6 +19,11 @@ urlpatterns = [
 
     path('repair/', views.repair, name='repair'),
     path('order/', views.order, name='order'),
+    
+    # Razorpay Payment URLs
+    path('payment/<int:order_id>/', views.payment_checkout, name='payment_checkout'),
+    path('payment/verify/', views.payment_verify, name='payment_verify'),
+    path('payment/failed/', views.payment_failed, name='payment_failed'),
 
     path('profile/', views.profile, name='profile'),
     path('upload-profile-image/', views.upload_profile_image, name='upload_profile_image'),

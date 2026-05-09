@@ -5,6 +5,9 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+import razorpay
 from .forms import RegisterForm, OrderUpdateForm
 from .models import Order, Repair, Profile
 
@@ -163,7 +166,7 @@ def order(request):
         price = product["price"]
         total = price * quantity
 
-        Order.objects.create(
+        order_obj = Order.objects.create(
             user=request.user,
             product_name=product["name"],
             name=name,
@@ -174,8 +177,8 @@ def order(request):
             total=total
         )
 
-        messages.success(request, "Your order has been submitted successfully!")
-        return redirect(f"/order/?product_id={product_id}")
+        # Redirect to payment checkout instead of immediate success
+        return redirect('payment_checkout', order_id=order_obj.id)
 
     context = {
         "product_name": product["name"] if product else "",
@@ -183,6 +186,79 @@ def order(request):
     }
 
     return render(request, "order.html", context)
+
+# ================================
+# RAZORPAY PAYMENT LOGIC
+# ================================
+
+@login_required
+def payment_checkout(request, order_id):
+    order_obj = get_object_or_404(Order, id=order_id, user=request.user)
+
+    # IMPORTANT: ₹1 testing amount override. 
+    # To switch to real product prices, change this to:
+    # amount = int(order_obj.total * 100)
+    amount = 100  # ₹1 = 100 paise
+
+    client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+
+    razorpay_order = client.order.create({
+        "amount": amount,
+        "currency": "INR",
+        "payment_capture": "1"
+    })
+
+    order_obj.razorpay_order_id = razorpay_order['id']
+    order_obj.save()
+
+    context = {
+        'order': order_obj,
+        'razorpay_order_id': razorpay_order['id'],
+        'razorpay_key_id': settings.RAZORPAY_KEY_ID,
+        'amount': amount,
+    }
+
+    return render(request, "payment_checkout.html", context)
+
+@csrf_exempt
+def payment_verify(request):
+    if request.method == "POST":
+        razorpay_payment_id = request.POST.get('razorpay_payment_id')
+        razorpay_order_id = request.POST.get('razorpay_order_id')
+        razorpay_signature = request.POST.get('razorpay_signature')
+
+        client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+        
+        try:
+            client.utility.verify_payment_signature({
+                'razorpay_order_id': razorpay_order_id,
+                'razorpay_payment_id': razorpay_payment_id,
+                'razorpay_signature': razorpay_signature
+            })
+            
+            # If signature is valid, update order status
+            order = Order.objects.get(razorpay_order_id=razorpay_order_id)
+            order.payment_status = 'Paid'
+            order.razorpay_payment_id = razorpay_payment_id
+            order.razorpay_signature = razorpay_signature
+            order.save()
+            
+            messages.success(request, "Payment successful! Your order has been placed.")
+            return render(request, "payment_success.html", {'order': order})
+            
+        except razorpay.errors.SignatureVerificationError:
+            order = Order.objects.filter(razorpay_order_id=razorpay_order_id).first()
+            if order:
+                order.payment_status = 'Failed'
+                order.save()
+            messages.error(request, "Payment verification failed.")
+            return redirect('payment_failed')
+            
+    return redirect('index')
+
+@login_required
+def payment_failed(request):
+    return render(request, "payment_failed.html")
 
 
 @login_required

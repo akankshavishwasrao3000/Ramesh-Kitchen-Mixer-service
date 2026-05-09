@@ -40,6 +40,12 @@ class Order(models.Model):
     order_status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Processing')
     delivery_days = models.CharField(max_length=20, default='3-7 days')
 
+    # Razorpay Payment Fields
+    payment_status = models.CharField(max_length=20, default='Unpaid')
+    razorpay_order_id = models.CharField(max_length=100, blank=True, null=True)
+    razorpay_payment_id = models.CharField(max_length=100, blank=True, null=True)
+    razorpay_signature = models.CharField(max_length=255, blank=True, null=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
