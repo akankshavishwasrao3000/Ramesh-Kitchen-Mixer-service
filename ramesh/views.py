@@ -10,6 +10,9 @@ from django.views.decorators.csrf import csrf_exempt
 import razorpay
 from .forms import RegisterForm, OrderUpdateForm
 from .models import Order, Repair, Profile
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 # Signup View
@@ -195,7 +198,9 @@ def order(request):
 def payment_checkout(request, order_id):
     order_obj = get_object_or_404(Order, id=order_id, user=request.user)
 
-    amount = int(order_obj.total * 100)
+    # Temporary testing amount (₹1)
+    # Production ready structure: replace with `amount = int(order_obj.total * 100)` when done testing.
+    amount = 100 
 
     client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
 
@@ -241,13 +246,16 @@ def payment_verify(request):
                     order.razorpay_payment_id = razorpay_payment_id
                     order.razorpay_signature = razorpay_signature
                     order.save()
+                    logger.info(f"Payment verified and order {order.id} marked as Paid.")
                 messages.success(request, "Payment successful! Your order has been placed.")
                 return render(request, "payment_success.html", {'order': order})
             else:
+                logger.error(f"Order not found for razorpay_order_id: {razorpay_order_id}")
                 messages.error(request, "Order not found for verification.")
                 return redirect('index')
             
         except razorpay.errors.SignatureVerificationError:
+            logger.warning(f"SignatureVerificationError for order {razorpay_order_id}")
             order = Order.objects.filter(razorpay_order_id=razorpay_order_id).first()
             if order and order.payment_status != 'Paid':
                 order.payment_status = 'Failed'
@@ -255,6 +263,7 @@ def payment_verify(request):
             messages.error(request, "Payment verification failed due to invalid signature.")
             return redirect('payment_failed')
         except Exception as e:
+            logger.error(f"Unexpected error during payment verification: {e}")
             messages.error(request, "An unexpected error occurred during verification.")
             return redirect('payment_failed')
             
@@ -265,11 +274,13 @@ def payment_verify(request):
 def payment_failed(request):
     if request.method == "POST":
         razorpay_order_id = request.POST.get('razorpay_order_id')
+        logger.info(f"Payment failed callback received for order: {razorpay_order_id}")
         if razorpay_order_id:
             order = Order.objects.filter(razorpay_order_id=razorpay_order_id, user=request.user).first()
             if order and order.payment_status != 'Paid':
                 order.payment_status = 'Failed'
                 order.save()
+                logger.info(f"Order {order.id} marked as Failed.")
     return render(request, "payment_failed.html")
 
 
