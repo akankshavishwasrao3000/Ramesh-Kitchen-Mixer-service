@@ -35,18 +35,12 @@
                         </li>
                     </ul>
 
-                    <!-- TEST MODE ALERT -->
-                    <div class="alert alert-warning text-center">
-                        <i class="bi bi-info-circle"></i> 
-                        <strong>Testing Mode Active:</strong> You will only be charged ₹1 for this test transaction. 
-                        <br><small class="text-muted">(Developer: Change 'amount' in views.py back to real price when ready)</small>
-                    </div>
-
                     <div class="text-center">
                         <button id="rzp-button1" class="btn btn-primary btn-lg w-100 rounded-pill shadow-sm mt-2">
                             <i class="bi bi-shield-lock"></i> Pay Now (₹1)
                         </button>
-                        <a href="{% url 'order' %}?product_id={{ order.product_name }}" class="btn btn-outline-secondary w-100 rounded-pill mt-3">Cancel</a>
+                        <a href="{% url 'order' %}?product_id={{ order.product_name }}"
+                            class="btn btn-outline-secondary w-100 rounded-pill mt-3">Cancel</a>
                     </div>
                 </div>
             </div>
@@ -57,57 +51,77 @@
 <!-- Razorpay Integration Script -->
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
-var options = {
-    "key": "{{ razorpay_key_id }}", // Enter the Key ID generated from the Dashboard
-    "amount": "{{ amount }}", // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
-    "currency": "INR",
-    "name": "Ramesh Kitchen Mixer",
-    "description": "Payment for {{ order.product_name }}",
-    "image": "https://example.com/your_logo",
-    "order_id": "{{ razorpay_order_id }}", //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
-    "handler": function (response){
-        // Post the data to verification view
+    var options = {
+        "key": "{{ razorpay_key_id }}", // Enter the Key ID generated from the Dashboard
+        "amount": "{{ amount }}", // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+        "currency": "INR",
+        "name": "Ramesh Kitchen Mixer",
+        "description": "Payment for {{ order.product_name }}",
+        "image": "https://example.com/your_logo",
+        "order_id": "{{ razorpay_order_id }}", //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+        "handler": function (response) {
+            // Post the data to verification view
+            var form = document.createElement("form");
+            form.method = "POST";
+            form.action = "{% url 'payment_verify' %}";
+
+            var fields = {
+                "razorpay_payment_id": response.razorpay_payment_id,
+                "razorpay_order_id": response.razorpay_order_id,
+                "razorpay_signature": response.razorpay_signature
+            };
+
+            for (var key in fields) {
+                if (fields.hasOwnProperty(key)) {
+                    var hiddenField = document.createElement("input");
+                    hiddenField.type = "hidden";
+                    hiddenField.name = key;
+                    hiddenField.value = fields[key];
+                    form.appendChild(hiddenField);
+                }
+            }
+            document.body.appendChild(form);
+            form.submit();
+        },
+        "prefill": {
+            "name": "{{ order.name }}",
+            "contact": "{{ order.phone }}"
+        },
+        "theme": {
+            "color": "#0d6efd"
+        }
+    };
+
+    var rzp1 = new Razorpay(options);
+
+    rzp1.on('payment.failed', function (response) {
+        // Send data to backend to update order status to Failed
         var form = document.createElement("form");
         form.method = "POST";
-        form.action = "{% url 'payment_verify' %}";
-        
-        var fields = {
-            "razorpay_payment_id": response.razorpay_payment_id,
-            "razorpay_order_id": response.razorpay_order_id,
-            "razorpay_signature": response.razorpay_signature
-        };
+        form.action = "{% url 'payment_failed' %}";
 
-        for(var key in fields) {
-            if(fields.hasOwnProperty(key)) {
-                var hiddenField = document.createElement("input");
-                hiddenField.type = "hidden";
-                hiddenField.name = key;
-                hiddenField.value = fields[key];
-                form.appendChild(hiddenField);
-            }
-        }
+        var hiddenField = document.createElement("input");
+        hiddenField.type = "hidden";
+        hiddenField.name = "razorpay_order_id";
+        // Usually response contains error object with metadata
+        // If not, we can also pass the razorpay_order_id from our Django template
+        hiddenField.value = response.error ? response.error.metadata.order_id : "{{ razorpay_order_id }}";
+
+        // Add CSRF token for the POST request
+        var csrfInput = document.createElement("input");
+        csrfInput.type = "hidden";
+        csrfInput.name = "csrfmiddlewaretoken";
+        csrfInput.value = "{{ csrf_token }}";
+
+        form.appendChild(hiddenField);
+        form.appendChild(csrfInput);
         document.body.appendChild(form);
         form.submit();
-    },
-    "prefill": {
-        "name": "{{ order.name }}",
-        "contact": "{{ order.phone }}"
-    },
-    "theme": {
-        "color": "#0d6efd"
+    });
+
+    document.getElementById('rzp-button1').onclick = function (e) {
+        rzp1.open();
+        e.preventDefault();
     }
-};
-
-var rzp1 = new Razorpay(options);
-
-rzp1.on('payment.failed', function (response){
-    // Optional: Send data to backend or redirect to failed page
-    window.location.href = "{% url 'payment_failed' %}";
-});
-
-document.getElementById('rzp-button1').onclick = function(e){
-    rzp1.open();
-    e.preventDefault();
-}
 </script>
 {% endblock %}
