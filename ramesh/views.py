@@ -198,9 +198,11 @@ def order(request):
 def payment_checkout(request, order_id):
     order_obj = get_object_or_404(Order, id=order_id, user=request.user)
 
-    # Temporary testing amount (₹1)
-    # Production ready structure: replace with `amount = int(order_obj.total * 100)` when done testing.
-    amount = 100 
+    # Calculate exact amount in paise (₹1 = 100 paise)
+    # amount = int(order_obj.total * 100)
+    
+    # Uncomment the below line ONLY for ₹1 testing, then comment it out again for production
+    amount = 100
 
     client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
 
@@ -228,42 +230,54 @@ def payment_verify(request):
         razorpay_payment_id = request.POST.get('razorpay_payment_id')
         razorpay_order_id = request.POST.get('razorpay_order_id')
         razorpay_signature = request.POST.get('razorpay_signature')
+        
+        logger.info(f"Payment verification started for Order ID: {razorpay_order_id}, Payment ID: {razorpay_payment_id}")
+
+        if not razorpay_order_id or not razorpay_payment_id or not razorpay_signature:
+            logger.error("Missing Razorpay parameters in POST request.")
+            messages.error(request, "Invalid payment response received.")
+            return redirect('payment_failed')
 
         client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
         
         try:
+            # 1. Verify Razorpay signature
             client.utility.verify_payment_signature({
                 'razorpay_order_id': razorpay_order_id,
                 'razorpay_payment_id': razorpay_payment_id,
                 'razorpay_signature': razorpay_signature
             })
             
-            # If signature is valid, update order status
+            # 2. If successful, find the order and update
             order = Order.objects.filter(razorpay_order_id=razorpay_order_id).first()
             if order:
-                if order.payment_status != 'Paid':
-                    order.payment_status = 'Paid'
-                    order.razorpay_payment_id = razorpay_payment_id
-                    order.razorpay_signature = razorpay_signature
-                    order.save()
-                    logger.info(f"Payment verified and order {order.id} marked as Paid.")
+                order.payment_status = 'Paid'
+                order.razorpay_payment_id = razorpay_payment_id
+                order.razorpay_signature = razorpay_signature
+                order.save()
+                
+                logger.info(f"Payment verified successfully. Order {order.id} marked as Paid.")
                 messages.success(request, "Payment successful! Your order has been placed.")
                 return render(request, "payment_success.html", {'order': order})
             else:
-                logger.error(f"Order not found for razorpay_order_id: {razorpay_order_id}")
+                logger.error(f"Order not found in DB for razorpay_order_id: {razorpay_order_id}")
                 messages.error(request, "Order not found for verification.")
                 return redirect('index')
             
         except razorpay.errors.SignatureVerificationError:
-            logger.warning(f"SignatureVerificationError for order {razorpay_order_id}")
+            # 3. If verification fails, mark as Failed
+            logger.warning(f"Signature Verification Failed for order {razorpay_order_id}")
             order = Order.objects.filter(razorpay_order_id=razorpay_order_id).first()
-            if order and order.payment_status != 'Paid':
+            if order:
                 order.payment_status = 'Failed'
                 order.save()
+                logger.info(f"Order {order.id} marked as Failed due to SignatureVerificationError.")
+            
             messages.error(request, "Payment verification failed due to invalid signature.")
             return redirect('payment_failed')
+            
         except Exception as e:
-            logger.error(f"Unexpected error during payment verification: {e}")
+            logger.error(f"Unexpected error during payment verification: {str(e)}")
             messages.error(request, "An unexpected error occurred during verification.")
             return redirect('payment_failed')
             

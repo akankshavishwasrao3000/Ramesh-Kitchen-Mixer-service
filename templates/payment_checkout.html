@@ -80,6 +80,14 @@
                     form.appendChild(hiddenField);
                 }
             }
+            
+            // Add CSRF token for the POST request
+            var csrfInput = document.createElement("input");
+            csrfInput.type = "hidden";
+            csrfInput.name = "csrfmiddlewaretoken";
+            csrfInput.value = "{{ csrf_token }}";
+            form.appendChild(csrfInput);
+
             document.body.appendChild(form);
             form.submit();
         },

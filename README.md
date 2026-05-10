@@ -225,6 +225,7 @@ This project is available for portfolio and demonstration use. Feel free to adap
 
 ---
 ⚠️ Important Notice
+
 This project "Ramesh Kitchen Mixer Service" is developed by Akanksha Ramesh Vishwasrao.
 
 This project is licensed under the MIT License.
