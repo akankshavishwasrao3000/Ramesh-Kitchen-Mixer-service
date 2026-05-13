@@ -201,16 +201,15 @@ def payment_checkout(request, order_id):
     # Calculate exact amount in paise (₹1 = 100 paise)
     # amount = int(order_obj.total * 100)
     
-    # Uncomment the below line ONLY for ₹1 testing, then comment it out again for production
-    amount = 100
+    # Temporary ₹20 testing to bypass Razorpay ₹1 anti-fraud
+    amount = 2000
 
     client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
 
-    razorpay_order = client.order.create({
-        "amount": amount,
-        "currency": "INR",
-        "payment_capture": "1"
-    })
+    razorpay_order = client.order.create(dict(
+        amount=amount,
+        currency="INR"
+    ))
 
     order_obj.razorpay_order_id = razorpay_order['id']
     order_obj.save()
@@ -251,6 +250,18 @@ def payment_verify(request):
             # 2. If successful, find the order and update
             order = Order.objects.filter(razorpay_order_id=razorpay_order_id).first()
             if order:
+                # Determine correct amount based on testing vs production
+                # amount_to_capture = int(order.total * 100) # Use this in production
+                amount_to_capture = 2000 # Temporary ₹20 testing
+                
+                # Explicitly capture the payment to prevent auto-refund
+                try:
+                    client.payment.capture(razorpay_payment_id, amount_to_capture)
+                    logger.info(f"Payment {razorpay_payment_id} successfully captured manually.")
+                except Exception as capture_error:
+                    # It might auto-capture based on settings, or it might just fail
+                    logger.warning(f"Manual capture failed (could be already captured): {capture_error}")
+
                 order.payment_status = 'Paid'
                 order.razorpay_payment_id = razorpay_payment_id
                 order.razorpay_signature = razorpay_signature
