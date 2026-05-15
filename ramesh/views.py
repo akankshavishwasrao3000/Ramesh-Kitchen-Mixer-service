@@ -206,10 +206,13 @@ def payment_checkout(request, order_id):
 
     client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
 
-    razorpay_order = client.order.create(dict(
-        amount=amount,
-        currency="INR"
-    ))
+    razorpay_order = client.order.create({
+        "amount": amount,
+        "currency": "INR",
+        "payment": {
+            "capture": "automatic"
+        }
+    })
 
     order_obj.razorpay_order_id = razorpay_order['id']
     order_obj.save()
