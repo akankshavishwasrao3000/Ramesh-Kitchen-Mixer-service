@@ -180,7 +180,7 @@ def order(request):
             total=total
         )
 
-        # Redirect to payment checkout instead of immediate success
+        # Redirect to payment checkout with order ID in the URL
         return redirect('payment_checkout', order_id=order_obj.id)
 
     context = {
