@@ -21,6 +21,7 @@ urlpatterns = [
     path('order/', views.order, name='order'),
     
     # Razorpay Payment URLs
+    path('payment/', views.payment_home, name='payment_home'),              # Public landing for Razorpay reviewers
     path('payment/<int:order_id>/', views.payment_checkout, name='payment_checkout'),
     path('payment/verify/', views.payment_verify, name='payment_verify'),
     path('payment/failed/', views.payment_failed, name='payment_failed'),

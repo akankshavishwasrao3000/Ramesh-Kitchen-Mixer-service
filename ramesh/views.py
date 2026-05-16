@@ -194,6 +194,19 @@ def order(request):
 # RAZORPAY PAYMENT LOGIC
 # ================================
 
+def payment_home(request):
+    """
+    Public landing page for /payment/.
+    Razorpay reviewers visit this URL to validate the payment route.
+    Logged-in users are guided to products; anonymous users see an info page.
+    The existing dynamic route /payment/<order_id>/ is completely unaffected.
+    """
+    if request.user.is_authenticated:
+        messages.info(request, "To make a payment, please select a product first.")
+        return redirect('products')
+    # For unauthenticated visitors (e.g. Razorpay reviewers), show a simple info page
+    return render(request, 'payment_info.html')
+
 @login_required
 def payment_checkout(request, order_id):
     order_obj = get_object_or_404(Order, id=order_id, user=request.user)
