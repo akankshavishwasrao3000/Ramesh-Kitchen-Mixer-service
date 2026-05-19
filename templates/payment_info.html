@@ -1,39 +1,40 @@
 {% extends "base.html" %}
 
-{% block title %}Payment - Ramesh Kitchen Mixer{% endblock %}
+{% block title %}Secure Payment Gateway - Ramesh Kitchen Mixer{% endblock %}
 
 {% block content %}
 <div class="container py-5 mt-5">
     <div class="row justify-content-center">
         <div class="col-md-7 col-lg-6">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-dark text-white text-center py-3">
-                    <h4 class="mb-0"><i class="bi bi-credit-card"></i> Online Payment</h4>
+            <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+                <div class="card-header bg-dark text-white text-center py-4 border-0">
+                    <h4 class="mb-0 fw-bold"><i class="bi bi-shield-lock-fill me-2 text-warning"></i> Secure Payment Gateway</h4>
                 </div>
-                <div class="card-body p-4 text-center">
+                <div class="card-body p-5 text-center bg-light">
                     <div class="mb-4">
-                        <i class="bi bi-shield-lock-fill text-success" style="font-size: 3rem;"></i>
+                        <div class="d-inline-flex align-items-center justify-content-center bg-white rounded-circle shadow-sm" style="width: 90px; height: 90px;">
+                            <i class="bi bi-credit-card-2-front text-success" style="font-size: 3rem;"></i>
+                        </div>
                     </div>
-                    <h5 class="fw-bold mb-2">Secure Payment Gateway</h5>
-                    <p class="text-muted mb-4">
-                        Ramesh Kitchen Mixer accepts secure online payments powered by
-                        <strong>Razorpay</strong>. To make a payment, please browse our products
-                        and place an order — you will be directed to the payment page automatically.
+                    
+                    <h3 class="fw-bold mb-3 text-dark">Secure Payment Gateway</h3>
+                    
+                    <h5 class="text-secondary mb-3 fw-semibold">Payments powered by Razorpay</h5>
+                    
+                    <p class="text-muted mb-4 fs-5">
+                        Browse products to continue payment
                     </p>
 
-                    <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
-                        <a href="{% url 'products' %}" class="btn btn-primary btn-lg rounded-pill px-4">
-                            <i class="bi bi-bag"></i> View Products
-                        </a>
-                        <a href="{% url 'login' %}" class="btn btn-outline-secondary btn-lg rounded-pill px-4">
-                            <i class="bi bi-person"></i> Login to Order
+                    <div class="d-flex justify-content-center mb-3">
+                        <a href="{% url 'products' %}" class="btn btn-primary btn-lg rounded-pill px-5 py-3 shadow-sm fw-bold">
+                            <i class="bi bi-bag-fill me-2"></i> View Products
                         </a>
                     </div>
 
                     <hr class="my-4">
-                    <p class="text-muted small mb-0">
-                        <i class="bi bi-lock-fill text-success me-1"></i>
-                        All transactions are secured with 256-bit SSL encryption via Razorpay.
+                    <p class="text-muted small mb-0 d-flex align-items-center justify-content-center">
+                        <i class="bi bi-lock-fill text-success me-2 fs-5"></i>
+                        <span>All transactions are fully secured and encrypted via Razorpay.</span>
                     </p>
                 </div>
             </div>
