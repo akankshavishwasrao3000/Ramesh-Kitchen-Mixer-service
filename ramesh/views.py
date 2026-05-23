@@ -204,8 +204,8 @@ def payment_checkout(request, order_id):
     # Calculate exact amount in paise (₹1 = 100 paise)
     # amount = int(order_obj.total * 100)
     
-    # Temporary ₹20 testing to bypass Razorpay ₹1 anti-fraud
-    amount = 2000
+    # Temporary ₹5 testing
+    amount = 500
 
     client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
 
@@ -258,7 +258,7 @@ def payment_verify(request):
             if order:
                 # Determine correct amount based on testing vs production
                 # amount_to_capture = int(order.total * 100) # Use this in production
-                amount_to_capture = 2000 # Temporary ₹20 testing
+                amount_to_capture = 500 # Temporary ₹5 testing
                 
                 # Note: Payment is captured automatically as configured in payment_checkout.
                 # No manual capture call is needed here, preventing "already captured" errors.
