@@ -260,13 +260,8 @@ def payment_verify(request):
                 # amount_to_capture = int(order.total * 100) # Use this in production
                 amount_to_capture = 2000 # Temporary ₹20 testing
                 
-                # Explicitly capture the payment to prevent auto-refund
-                try:
-                    client.payment.capture(razorpay_payment_id, amount_to_capture)
-                    logger.info(f"Payment {razorpay_payment_id} successfully captured manually.")
-                except Exception as capture_error:
-                    # It might auto-capture based on settings, or it might just fail
-                    logger.warning(f"Manual capture failed (could be already captured): {capture_error}")
+                # Note: Payment is captured automatically as configured in payment_checkout.
+                # No manual capture call is needed here, preventing "already captured" errors.
 
                 order.payment_status = 'Paid'
                 order.razorpay_payment_id = razorpay_payment_id
