@@ -118,8 +118,9 @@ The project utilizes a **MySQL** database for robust data management.
 *   **Mobile App**: Dedicated Android/iOS application for easier access.
 
 ## 👤 Author
-**[Your Name / Ramesh Kitchen Mixer]**
-*Final Year Project - Computer Engineering*
+Author: Akanksha Ramesh Vishwasrao
+B.E. Computer Engineering
+Savitribai Phule Pune University (SPPU)
 
 ---
 © 2026 Ramesh Kitchen Mixer. All Rights Reserved.
