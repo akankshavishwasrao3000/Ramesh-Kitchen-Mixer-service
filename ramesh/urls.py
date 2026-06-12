@@ -20,11 +20,8 @@ urlpatterns = [
     path('repair/', views.repair, name='repair'),
     path('order/', views.order, name='order'),
     
-    # Razorpay Payment URLs
-    path('payment/', views.payment_home, name='payment_home'),              # Public landing for Razorpay reviewers
-    path('payment/<int:order_id>/', views.payment_checkout, name='payment_checkout'),
-    path('payment/verify/', views.payment_verify, name='payment_verify'),
-    path('payment/failed/', views.payment_failed, name='payment_failed'),
+    # Order Success URL
+    path('order/success/<int:order_id>/', views.order_success, name='order_success'),
 
     path('profile/', views.profile, name='profile'),
     path('upload-profile-image/', views.upload_profile_image, name='upload_profile_image'),

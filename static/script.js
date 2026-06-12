@@ -1,7 +1,23 @@
 // Simple rule-based chatbot for Ramesh Kitchen Mixer
+let chatInitialized = false;
+
 function toggleChat() {
     const chatbox = document.getElementById('chatbox');
-    chatbox.style.display = chatbox.style.display === 'none' ? 'block' : 'none';
+    const isOpening = chatbox.style.display === 'none' || chatbox.style.display === '';
+    
+    chatbox.style.display = isOpening ? 'block' : 'none';
+
+    // Show welcome message only the first time the chat is opened
+    if (isOpening && !chatInitialized) {
+        chatInitialized = true;
+        const chatMessages = document.getElementById('chatmessages');
+        if (chatMessages && chatMessages.innerHTML.trim() === "") {
+            setTimeout(() => {
+                const welcomeMsg = `Hello 👋 Welcome to Ramesh Kitchen Mixer!<br><br>I can help you with:<br><br>🛒 Product Information<br>🔧 Mixer Repair Services<br>📦 Delivery Information<br>📍 Shop Location<br>📞 Contact Details<br>💬 WhatsApp Support<br><br>How may I assist you today?`;
+                addBotMessage(welcomeMsg);
+            }, 300);
+        }
+    }
 }
 
 function handleKey(event) {
@@ -15,15 +31,13 @@ function sendMessage() {
     const rawText = userInput.value.trim();
     if (rawText === '') return;
 
-    const message = rawText.toLowerCase();
-
     addUserMessage(rawText);
     userInput.value = '';
     showTypingIndicator();
 
     setTimeout(() => {
         hideTypingIndicator();
-        const response = getBotResponse(message);
+        const response = getBotResponse(rawText);
         addBotMessage(response);
     }, 700);
 }
@@ -72,64 +86,72 @@ function getTimeStamp() {
 }
 
 function getBotResponse(message) {
-    // 1. Check for greetings FIRST
-    const greetings = ['hi', 'hello', 'hey', 'good morning', 'good evening', 'good afternoon'];
-    for (let greeting of greetings) {
-        if (message.startsWith(greeting) || message === greeting) {
-            return `Hello 👋 Welcome to Ramesh Kitchen Mixer!<br>
-I am your AI assistant 😊<br><br>
-You can ask me:<br>
-• Product price 💰<br>
-• How to order 🛒<br>
-• Repair service 🔧<br>
-• Warranty 📄<br>
-• Shop location 📍`;
+    const msg = message.trim().toLowerCase();
+
+    // 1. GIBBERISH DETECTION (The "Worst Case" Warning)
+    // Check for random strings like "jsdhfksj" or "aaaaaaa"
+    const hasVowels = /[aeiouy]/.test(msg);
+    const unusualLength = msg.length > 20 && !msg.includes(' ');
+    const repeatedChar = /(.)\1{4,}/.test(msg); // 5+ same chars in a row
+
+    if ((!hasVowels && msg.length > 5) || unusualLength || repeatedChar) {
+        return "I'm sorry, I couldn't understand that input. 😅 Please ask a question related to our products, repairs, or orders so I can assist you properly!";
+    }
+
+    // 2. DETAILED RESPONSE LOGIC
+    let response = "";
+
+    // PRICE & COST
+    if (["price", "cost", "amount", "rate", "how much", "mrp", "bucks", "value"].some(k => msg.includes(k))) {
+        response += "Our premium mixers range from **₹3500 up to ₹4550**. You can see the specific rates for every model on our Products page.<br><br>";
+    }
+
+    // PRODUCT SPECS
+    if (["detail", "info", "spec", "feature", "motor", "watt", "jar", "quality", "good"].some(k => msg.includes(k))) {
+        response += "Ramesh Mixers are built for durability with **900W motors**, 3 stainless steel jars, and a **24-month warranty**. Each model is designed for high-performance home cooking.<br><br>";
+    }
+
+    // REPAIR
+    if (["repair", "fix", "service", "working", "problem", "broken", "issue", "mechanic"].some(k => msg.includes(k))) {
+        response += "We provide expert repair services for all mixers. Simply fill out the **Repair Request** form on our website, and we will contact you for a pickup or visit.<br><br>";
+    }
+
+    // CONTACT & WHATSAPP
+    if (["contact", "phone", "mobile", "whatsapp", "call", "number", "reach", "talk"].some(k => msg.includes(k))) {
+        response += "You can reach us directly at **+91 9921071945** or click the WhatsApp icon on our site for instant support.<br><br>";
+    }
+
+    // LOCATION
+    if (["location", "address", "shop", "where", "store", "place", "city", "village", "belhe"].some(k => msg.includes(k))) {
+        response += "Ramesh Kitchen Mixer is located in **Belhe, Maharashtra 412410**. You are welcome to visit us during business hours!<br><br>";
+    }
+
+    // DELIVERY
+    if (["delivery", "shipping", "courier", "send", "receive", "home", "post"].some(k => msg.includes(k))) {
+        response += "We offer local delivery. Once you place an order, we'll confirm the delivery timeline (usually 3-7 days) via WhatsApp.<br><br>";
+    }
+
+    // ORDERING
+    if (["order", "place", "buy", "purchase", "shopping", "cart", "checkout"].some(k => msg.includes(k))) {
+        response += "To buy, select your favorite model on the **Products page** and fill the order form. No online payment is needed; we confirm everything on WhatsApp first!<br><br>";
+    }
+
+    // 3. IF NO Intent FOUND
+    if (response === "") {
+        // Handle greetings specifically if no other info requested
+        if (["hi", "hello", "hey", "namaste", "morning", "evening"].some(k => msg.includes(k))) {
+            return "Hello 👋 Welcome to Ramesh Kitchen Mixer! I can help you with product prices, mixer repairs, delivery details, or our shop location. How may I assist you today?";
         }
+        
+        if (["thanks", "thank you", "great", "ok", "fine"].some(k => msg.includes(k))) {
+            return "You're very welcome! 😊 Let me know if you have any other questions.";
+        }
+
+        // Standard Fallback
+        return "I can help you with:<br><br>🛒 **Product Pricing** (₹3500 - ₹4550)<br>🔧 **Repair Bookings**<br>📦 **Delivery Information**<br>📍 **Shop Address** (Belhe)<br>📞 **Contact Details**<br><br>Please ask your question or select a topic!";
     }
 
-    // 2. Check for known queries
-    if (message.includes('price') || message.includes('cost') || message.includes('amount')) {
-        return 'Our kitchen mixers start from ₹1500. For specific models, please visit our products page! 💰';
-    }
-    if (message.includes('delivery') || message.includes('arrival') || message.includes('days') || message.includes('shipping')) {
-        return 'Delivery usually takes 3–7 days depending on your location. 🚚';
-    }
-    if (message.includes('track') || message.includes('tracking') || message.includes('order status') || message.includes('status')) {
-        return 'You can track your order in your profile dashboard under \'My Orders\'.';
-    }
-    if (message.includes('repair') || message.includes('request repair') || message.includes('service')) {
-        return 'Go to Repair section, fill the form, and submit your request. We will contact you shortly. 🔧';
-    }
-    if (message.includes('payment') || message.includes('methods') || message.includes('cash') || message.includes('pay')) {
-        return 'Currently, we support Cash on Delivery. 💵';
-    }
-    if (message.includes('contact') || message.includes('phone') || message.includes('reach')) {
-        return 'You can contact us through the contact form or phone number available on website. ☎️';
-    }
-    if (message.includes('order') || message.includes('buy') || message.includes('how to order')) {
-        return 'To order, visit our products page, select your mixer, and click "Add to Cart". We deliver within 2-3 days! 🛒';
-    }
-    if (message.includes('warranty')) {
-        return 'All our products come with 1-year warranty. Register your product online for extended coverage! 📄';
-    }
-    if (message.includes('location') || message.includes('where')) {
-        return 'We are located at 123 Main Street, City Center. Open 9 AM to 9 PM daily! 📍';
-    }
-
-    // 3. Check for thanks or bye
-    if (message.includes('thank') || message.includes('bye')) {
-        return 'You\'re welcome! 😊 Have a great day!';
-    }
-
-    // 4. Fallback for short or random messages
-    if (message.length < 2 || !/[a-zA-Z]/.test(message)) {
-        return `Sorry 😅 I didn’t understand that.<br>
-Please type something like:<br>
-orders, delivery, repair, or contact`;
-    }
-
-    // 5. Default response
-    return `I'm sorry, I didn't understand that. Please try asking about orders, delivery, repair, or contact.`;
+    return response;
 }
 
 // Services page scroll animations

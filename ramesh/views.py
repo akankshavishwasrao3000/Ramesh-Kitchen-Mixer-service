@@ -7,7 +7,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
-import razorpay
 from .forms import RegisterForm, OrderUpdateForm
 from .models import Order, Repair, Profile
 import logging
@@ -180,8 +179,8 @@ def order(request):
             total=total
         )
 
-        # Redirect to payment checkout with order ID in the URL
-        return redirect('payment_checkout', order_id=order_obj.id)
+        # Save to database and redirect to success page
+        return redirect('order_success', order_id=order_obj.id)
 
     context = {
         "product_name": product["name"] if product else "",
@@ -190,124 +189,23 @@ def order(request):
 
     return render(request, "order.html", context)
 
-# ================================
-# RAZORPAY PAYMENT LOGIC
-# ================================
-
-def payment_home(request):
-    return render(request, 'payment_info.html')
-
 @login_required
-def payment_checkout(request, order_id):
+def order_success(request, order_id):
     order_obj = get_object_or_404(Order, id=order_id, user=request.user)
-
-    # Calculate exact amount in paise (₹1 = 100 paise)
-    # amount = int(order_obj.total * 100)
     
-    # Temporary ₹5 testing
-    amount = 500
-
-    client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
-
-    razorpay_order = client.order.create({
-        "amount": amount,
-        "currency": "INR",
-        "payment": {
-            "capture": "automatic"
-        }
+    # WhatsApp details
+    whatsapp_number = "919921071945"  # As found in contact.html
+    message = f"Hello, I have placed an order for {order_obj.product_name}.\nName: {order_obj.name}\nMobile: {order_obj.phone}\n\nPlease contact me regarding this order."
+    
+    # URL encode the message
+    import urllib.parse
+    encoded_message = urllib.parse.quote(message)
+    whatsapp_url = f"https://wa.me/{whatsapp_number}?text={encoded_message}"
+    
+    return render(request, "order_success.html", {
+        "order": order_obj,
+        "whatsapp_url": whatsapp_url
     })
-
-    order_obj.razorpay_order_id = razorpay_order['id']
-    order_obj.save()
-
-    context = {
-        'order': order_obj,
-        'razorpay_order_id': razorpay_order['id'],
-        'razorpay_key_id': settings.RAZORPAY_KEY_ID,
-        'amount': amount,
-    }
-
-    return render(request, "payment_checkout.html", context)
-
-@csrf_exempt
-def payment_verify(request):
-    if request.method == "POST":
-        razorpay_payment_id = request.POST.get('razorpay_payment_id')
-        razorpay_order_id = request.POST.get('razorpay_order_id')
-        razorpay_signature = request.POST.get('razorpay_signature')
-        
-        logger.info(f"Payment verification started for Order ID: {razorpay_order_id}, Payment ID: {razorpay_payment_id}")
-
-        if not razorpay_order_id or not razorpay_payment_id or not razorpay_signature:
-            logger.error("Missing Razorpay parameters in POST request.")
-            messages.error(request, "Invalid payment response received.")
-            return redirect('payment_failed')
-
-        client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
-        
-        try:
-            # 1. Verify Razorpay signature
-            client.utility.verify_payment_signature({
-                'razorpay_order_id': razorpay_order_id,
-                'razorpay_payment_id': razorpay_payment_id,
-                'razorpay_signature': razorpay_signature
-            })
-            
-            # 2. If successful, find the order and update
-            order = Order.objects.filter(razorpay_order_id=razorpay_order_id).first()
-            if order:
-                # Determine correct amount based on testing vs production
-                # amount_to_capture = int(order.total * 100) # Use this in production
-                amount_to_capture = 500 # Temporary ₹5 testing
-                
-                # Note: Payment is captured automatically as configured in payment_checkout.
-                # No manual capture call is needed here, preventing "already captured" errors.
-
-                order.payment_status = 'Paid'
-                order.razorpay_payment_id = razorpay_payment_id
-                order.razorpay_signature = razorpay_signature
-                order.save()
-                
-                logger.info(f"Payment verified successfully. Order {order.id} marked as Paid.")
-                messages.success(request, "Payment successful! Your order has been placed.")
-                return render(request, "payment_success.html", {'order': order})
-            else:
-                logger.error(f"Order not found in DB for razorpay_order_id: {razorpay_order_id}")
-                messages.error(request, "Order not found for verification.")
-                return redirect('index')
-            
-        except razorpay.errors.SignatureVerificationError:
-            # 3. If verification fails, mark as Failed
-            logger.warning(f"Signature Verification Failed for order {razorpay_order_id}")
-            order = Order.objects.filter(razorpay_order_id=razorpay_order_id).first()
-            if order:
-                order.payment_status = 'Failed'
-                order.save()
-                logger.info(f"Order {order.id} marked as Failed due to SignatureVerificationError.")
-            
-            messages.error(request, "Payment verification failed due to invalid signature.")
-            return redirect('payment_failed')
-            
-        except Exception as e:
-            logger.error(f"Unexpected error during payment verification: {str(e)}")
-            messages.error(request, "An unexpected error occurred during verification.")
-            return redirect('payment_failed')
-            
-    return redirect('index')
-
-@csrf_exempt
-@login_required
-def payment_failed(request):
-    if request.method == "POST":
-        razorpay_order_id = request.POST.get('razorpay_order_id')
-        logger.info(f"Payment failed callback received for order: {razorpay_order_id}")
-        if razorpay_order_id:
-            order = Order.objects.filter(razorpay_order_id=razorpay_order_id, user=request.user).first()
-            if order and order.payment_status != 'Paid':
-                order.payment_status = 'Failed'
-                order.save()
-                logger.info(f"Order {order.id} marked as Failed.")
-    return render(request, "payment_failed.html")
 
 
 @login_required
