@@ -23,10 +23,13 @@ CSRF_TRUSTED_ORIGINS = [
     origin.strip()
     for origin in os.getenv(
         'CSRF_TRUSTED_ORIGINS',
-        'https://ramesh-kitchen-mixer-service-production.up.railway.app,http://127.0.0.1:8000,http://localhost:8000'
+        'https://ramesh-kitchen-mixer-service-production.up.railway.app'
     ).split(',')
     if origin.strip()
 ]
+# Add localhost and 127.0.0.1 for local development if not in production
+if DEBUG:
+    CSRF_TRUSTED_ORIGINS += ['http://127.0.0.1:8000', 'http://localhost:8000']
 
 
 # Quick-start development settings - unsuitable for production
@@ -49,10 +52,15 @@ ALLOWED_HOSTS = [
     host.strip()
     for host in os.getenv(
         "ALLOWED_HOSTS",
-        "ramesh-kitchen-mixer-service-production.up.railway.app,127.0.0.1,localhost"
+        "ramesh-kitchen-mixer-service-production.up.railway.app,localhost,127.0.0.1"
     ).split(',')
     if host.strip()
 ]
+# If we are on Railway, they usually provide the RAILWAY_PUBLIC_DOMAIN variable
+railway_domain = os.getenv("RAILWAY_PUBLIC_DOMAIN")
+if railway_domain:
+    ALLOWED_HOSTS.append(railway_domain)
+    CSRF_TRUSTED_ORIGINS.append(f"https://{railway_domain}")
 
 
 # Application definition
