@@ -460,7 +460,6 @@
                         <th>Price</th>
                         <th>Qty</th>
                         <th>Total</th>
-                        <th>Payment</th>
                         <th>Status</th>
                         <th>Delivery</th>
                         <th style="text-align: center;">Actions</th>
@@ -473,11 +472,6 @@
                         <td>₹{{ order.price }}</td>
                         <td>{{ order.quantity }}</td>
                         <td class="price-highlight">₹{{ order.total }}</td>
-                        <td>
-                            <span class="badge {% if order.payment_status == 'Paid' %}bg-success{% elif order.payment_status == 'Failed' %}bg-danger{% else %}bg-secondary{% endif %}">
-                                {{ order.payment_status }}
-                            </span>
-                        </td>
                         <td>
                             <span class="status-badge status-{{ order.order_status|lower|cut:' ' }}">
                                 {{ order.order_status }}
@@ -495,12 +489,10 @@
                                     </select>
                                     <button type="submit" class="btn-action btn-update" title="Update Status">✓ Update</button>
                                 </form>
-                                {% if order.order_status == "Delivered" %}
-                                <form method="post" action="{% url 'delete_order' order.id %}" class="delete-form" onsubmit="return confirm('Delete this delivered order? This cannot be undone.');">
+                                <form method="post" action="{% url 'delete_order' order.id %}" class="delete-form" onsubmit="return confirm('Delete this order? This cannot be undone.');">
                                     {% csrf_token %}
                                     <button type="submit" class="btn-action btn-delete" title="Delete Order">🗑️ Delete</button>
                                 </form>
-                                {% endif %}
                             </div>
                         </td>
                     </tr>
@@ -529,8 +521,9 @@
                     <tr>
                         <th>Problem Description</th>
                         <th>Email</th>
-                        <th>City</th>
+                         <th>City</th>
                         <th>Submitted</th>
+                        <th style="text-align: center;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -538,8 +531,14 @@
                     <tr>
                         <td class="text-truncate-custom" title="{{ repair.description }}">{{ repair.description }}</td>
                         <td>{{ repair.email|default:'—' }}</td>
-                        <td>{{ repair.city }}</td>
+                         <td>{{ repair.city }}</td>
                         <td>{{ repair.created_at|date:'M d, Y' }}</td>
+                        <td style="text-align: center;">
+                            <form method="post" action="{% url 'delete_repair' repair.id %}" class="delete-form" onsubmit="return confirm('Delete this repair request? This cannot be undone.');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-action btn-delete" title="Delete Repair">🗑️ Delete</button>
+                            </form>
+                        </td>
                     </tr>
                     {% empty %}
                     {% endfor %}
