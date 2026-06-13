@@ -21,26 +21,26 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Local development should default to DEBUG=True.
-DEBUG = os.getenv("DEBUG") == "True"
+DEBUG = os.getenv("DEBUG", "False") == "True"
 
+# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("SECRET_KEY")
 if not SECRET_KEY:
-    if DEBUG:
+    if os.getenv("DEBUG", "False") == "True":
         SECRET_KEY = "django-insecure-local-secret-key"
     else:
-        raise ImproperlyConfigured("SECRET_KEY is required in production.")
-
+        raise ImproperlyConfigured("The SECRET_KEY environment variable is required when DEBUG=False.")
 # Host and CSRF settings ----------------------------------------------------
 ALLOWED_HOSTS = [
     host.strip()
     for host in os.getenv(
         "ALLOWED_HOSTS",
-        "localhost,127.0.0.1,ramesh-kitchen-mixer-service-production.up.railway.app"
-    ).split(",")
+        "ramesh-kitchen-mixer-service-production.up.railway.app,127.0.0.1,localhost"
+    ).split(',')
     if host.strip()
 ]
 
-SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
 railway_domain = os.getenv("RAILWAY_PUBLIC_DOMAIN")
 if railway_domain:
     ALLOWED_HOSTS.append(railway_domain)
@@ -48,9 +48,9 @@ if railway_domain:
 CSRF_TRUSTED_ORIGINS = [
     origin.strip()
     for origin in os.getenv(
-        "CSRF_TRUSTED_ORIGINS",
-        "https://ramesh-kitchen-mixer-service-production.up.railway.app"
-    ).split(",")
+        'CSRF_TRUSTED_ORIGINS',
+        'https://ramesh-kitchen-mixer-service-production.up.railway.app,http://127.0.0.1:8000,http://localhost:8000'
+    ).split(',')
     if origin.strip()
 ]
 if railway_domain:
@@ -170,7 +170,7 @@ USE_I18N = True
 USE_TZ = True
 
 # Security settings ---------------------------------------------------------
-SECURE_SSL_REDIRECT = not DEBUG
+SECURE_SSL_REDIRECT = False
 CSRF_COOKIE_SECURE = not DEBUG
 SESSION_COOKIE_SECURE = not DEBUG
 SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
