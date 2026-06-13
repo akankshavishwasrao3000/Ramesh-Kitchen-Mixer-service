@@ -28,6 +28,8 @@ if not SECRET_KEY:
         raise ImproperlyConfigured("The SECRET_KEY environment variable is required when DEBUG=False.")
 
 # SECURITY WARNING: don't run with debug turned on in production!
+# DEBUG = True  -> Development mode (shows detailed error pages for debugging)
+# DEBUG = False -> Production mode (hides errors from users)
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
 CSRF_TRUSTED_ORIGINS = [
@@ -174,7 +176,7 @@ USE_I18N = True
 
 USE_TZ = True
 
-SECURE_SSL_REDIRECT = True
+SECURE_SSL_REDIRECT = not DEBUG
 CSRF_COOKIE_SECURE = not DEBUG
 SESSION_COOKIE_SECURE = not DEBUG
 SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0

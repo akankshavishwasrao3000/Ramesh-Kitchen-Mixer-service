@@ -1,0 +1,3 @@
+[settings]
+# Disable verification of GitHub artifact attestations for Python installs.
+python.github_attestations = false
