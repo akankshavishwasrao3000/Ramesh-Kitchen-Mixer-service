@@ -45,11 +45,17 @@ if railway_domain:
     ALLOWED_HOSTS.append(railway_domain)
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://ramesh-kitchen-mixer-service-production.up.railway.app"
-    
+    origin.strip()
+    for origin in os.getenv(
+        "CSRF_TRUSTED_ORIGINS",
+        "https://ramesh-kitchen-mixer-service-production.up.railway.app"
+    ).split(",")
+    if origin.strip()
 ]
 if railway_domain:
-    CSRF_TRUSTED_ORIGINS.append(f"https://{railway_domain}")
+    origin = f"https://{railway_domain}"
+    if origin not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(origin)
 
 if DEBUG and not CSRF_TRUSTED_ORIGINS:
     CSRF_TRUSTED_ORIGINS += ["http://127.0.0.1:8000", "http://localhost:8000"]
@@ -61,7 +67,7 @@ if DATABASE_URL:
         "default": dj_database_url.parse(
             DATABASE_URL,
             conn_max_age=600,
-            ssl_require=False,
+            ssl_require=not DEBUG,
         )
     }
 else:
@@ -84,7 +90,6 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "whitenoise",
     "ramesh",
 ]
 
