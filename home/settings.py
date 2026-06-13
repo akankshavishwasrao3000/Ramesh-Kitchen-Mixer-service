@@ -12,9 +12,9 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+from urllib.parse import parse_qs, unquote, urlparse
 from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
-import dj_database_url
 
 load_dotenv()
 
@@ -61,24 +61,46 @@ if DEBUG and not CSRF_TRUSTED_ORIGINS:
     CSRF_TRUSTED_ORIGINS += ["http://127.0.0.1:8000", "http://localhost:8000"]
 
 # Database configuration ----------------------------------------------------
-DATABASE_URL = os.getenv("DATABASE_URL") or os.getenv("MYSQL_URL")
-if DATABASE_URL:
-    DATABASES = {
-        "default": dj_database_url.parse(
-            DATABASE_URL,
-            conn_max_age=600,
-            ssl_require=not DEBUG,
-        )
+
+def parse_mysql_url(url):
+    parsed = urlparse(url)
+    if parsed.scheme not in ("mysql", "mysql+mysqlclient", "mysql+pymysql", "mysql+mysqldb"):
+        raise ValueError("Unsupported database scheme for MySQL URL: %s" % parsed.scheme)
+
+    query_options = {
+        key: value[0]
+        for key, value in parse_qs(parsed.query).items()
+        if key != "sslmode"
     }
+
+    config = {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": parsed.path.lstrip("/"),
+        "USER": unquote(parsed.username) if parsed.username else "",
+        "PASSWORD": unquote(parsed.password) if parsed.password else "",
+        "HOST": parsed.hostname or "127.0.0.1",
+        "PORT": str(parsed.port or 3306),
+    }
+    if query_options:
+        config["OPTIONS"] = query_options
+    return config
+
+MYSQL_URL = os.getenv("MYSQL_URL")
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+if MYSQL_URL:
+    DATABASES = {"default": parse_mysql_url(MYSQL_URL)}
+elif DATABASE_URL and DATABASE_URL.startswith("mysql"):
+    DATABASES = {"default": parse_mysql_url(DATABASE_URL)}
 else:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.mysql",
-            "NAME": os.getenv("DB_NAME", "home_db"),
-            "USER": os.getenv("DB_USER", "root"),
-            "PASSWORD": os.getenv("DB_PASSWORD", ""),
-            "HOST": os.getenv("DB_HOST", "127.0.0.1"),
-            "PORT": os.getenv("DB_PORT", "3306"),
+            "NAME": os.getenv("MYSQLDATABASE") or os.getenv("DB_NAME", "home_db"),
+            "USER": os.getenv("MYSQLUSER") or os.getenv("DB_USER", "root"),
+            "PASSWORD": os.getenv("MYSQLPASSWORD") or os.getenv("DB_PASSWORD", ""),
+            "HOST": os.getenv("MYSQLHOST") or os.getenv("DB_HOST", "127.0.0.1"),
+            "PORT": os.getenv("MYSQLPORT") or os.getenv("DB_PORT", "3306"),
         }
     }
 
@@ -90,6 +112,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "whitenoise",
     "ramesh",
 ]
 
