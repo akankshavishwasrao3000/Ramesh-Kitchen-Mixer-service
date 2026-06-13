@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 from urllib.parse import parse_qs, unquote, urlparse
 from django.core.exceptions import ImproperlyConfigured
+import dj_database_url
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -63,48 +64,31 @@ if DEBUG and not CSRF_TRUSTED_ORIGINS:
 
 # Database configuration ----------------------------------------------------
 
-def parse_mysql_url(url):
-    parsed = urlparse(url)
-    if parsed.scheme not in ("mysql", "mysql+mysqlclient", "mysql+pymysql", "mysql+mysqldb"):
-        raise ValueError("Unsupported database scheme for MySQL URL: %s" % parsed.scheme)
+DATABASE_URL = os.getenv("MYSQL_URL") or os.getenv("DATABASE_URL")
 
-    query_options = {
-        key: value[0]
-        for key, value in parse_qs(parsed.query).items()
-        if key != "sslmode"
+if DATABASE_URL:
+    
+    DATABASE_URL = DATABASE_URL.split("?")[0]
+
+    DATABASES = {
+        "default": dj_database_url.parse(
+            DATABASE_URL,
+            conn_max_age=600,
+            ssl_require=False,
+        )
     }
 
-    config = {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": parsed.path.lstrip("/"),
-        "USER": unquote(parsed.username) if parsed.username else "",
-        "PASSWORD": unquote(parsed.password) if parsed.password else "",
-        "HOST": parsed.hostname or "127.0.0.1",
-        "PORT": str(parsed.port or 3306),
-    }
-    if query_options:
-        config["OPTIONS"] = query_options
-    return config
-
-MYSQL_URL = os.getenv("MYSQL_URL")
-DATABASE_URL = os.getenv("DATABASE_URL")
-
-if MYSQL_URL:
-    DATABASES = {"default": parse_mysql_url(MYSQL_URL)}
-elif DATABASE_URL and DATABASE_URL.startswith("mysql"):
-    DATABASES = {"default": parse_mysql_url(DATABASE_URL)}
 else:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.mysql",
-            "NAME": os.getenv("MYSQLDATABASE") or os.getenv("DB_NAME", "home_db"),
-            "USER": os.getenv("MYSQLUSER") or os.getenv("DB_USER", "root"),
-            "PASSWORD": os.getenv("MYSQLPASSWORD") or os.getenv("DB_PASSWORD", ""),
-            "HOST": os.getenv("MYSQLHOST") or os.getenv("DB_HOST", "127.0.0.1"),
-            "PORT": os.getenv("MYSQLPORT") or os.getenv("DB_PORT", "3306"),
+            "NAME": os.getenv("DB_NAME", "home_db"),
+            "USER": os.getenv("DB_USER", "root"),
+            "PASSWORD": os.getenv("DB_PASSWORD", ""),
+            "HOST": os.getenv("DB_HOST", "127.0.0.1"),
+            "PORT": os.getenv("DB_PORT", "3306"),
         }
     }
-
 # Application definition ----------------------------------------------------
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -170,7 +154,7 @@ USE_I18N = True
 USE_TZ = True
 
 # Security settings ---------------------------------------------------------
-SECURE_SSL_REDIRECT = False
+SECURE_SSL_REDIRECT = not DEBUG
 CSRF_COOKIE_SECURE = not DEBUG
 SESSION_COOKIE_SECURE = not DEBUG
 SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
