@@ -5,12 +5,15 @@ venv/
 # Python cache
 __pycache__/
 *.pyc
+*.pyo
 
 # Database
 db.sqlite3
 
 # Environment variables
 .env
+.env.local
+.env.*.local
 
 # Django secret settings
 local_settings.py
@@ -27,3 +30,9 @@ Thumbs.db
 
 # Static files collected
 staticfiles/
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
