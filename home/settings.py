@@ -45,9 +45,8 @@ if railway_domain:
     ALLOWED_HOSTS.append(railway_domain)
 
 CSRF_TRUSTED_ORIGINS = [
-    origin.strip()
-    for origin in os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",")
-    if origin.strip()
+    "https://ramesh-kitchen-mixer-service-production.up.railway.app"
+    
 ]
 if railway_domain:
     CSRF_TRUSTED_ORIGINS.append(f"https://{railway_domain}")
