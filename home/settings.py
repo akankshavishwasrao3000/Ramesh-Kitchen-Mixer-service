@@ -21,7 +21,7 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Local development should default to DEBUG=True.
-DEBUG = os.getenv("DEBUG", "False") == "True"
+DEBUG = os.getenv("DEBUG") == "True"
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 if not SECRET_KEY:
@@ -40,6 +40,7 @@ ALLOWED_HOSTS = [
     if host.strip()
 ]
 
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 railway_domain = os.getenv("RAILWAY_PUBLIC_DOMAIN")
 if railway_domain:
     ALLOWED_HOSTS.append(railway_domain)
