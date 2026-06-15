@@ -109,7 +109,7 @@ The project utilizes a **MySQL** database for robust data management.
 
 
 ## 🔮 Future Enhancements
-*   **Payment Gateway**: Integration with Razorpay for automated online payments.
+*   **Payment Gateway**: Manual order confirmation via WhatsApp or phone.
 *   **Order Tracking**: Real-time status updates for orders and repairs.
 *   **Notifications**: Automated email and SMS notifications for customers.
 *   **Search & Filter**: Advanced product search and category filtering.
