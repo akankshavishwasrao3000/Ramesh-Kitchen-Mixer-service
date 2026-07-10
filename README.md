@@ -1,4 +1,4 @@
-# Ramesh Kitchen Mixer 🌪️
+# Ramesh Kitchen Mixer 
 
 Ramesh Kitchen Mixer is a Django-based business website developed for a local mixer repair and sales business. The platform allows customers to explore products, submit repair requests, place orders, and communicate directly through WhatsApp. The project focuses on digital business growth and customer engagement.
 
