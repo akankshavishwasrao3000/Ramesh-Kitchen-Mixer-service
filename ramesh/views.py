@@ -6,9 +6,17 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.conf import settings
-from django.views.decorators.csrf import csrf_exempt
-from .forms import RegisterForm, OrderUpdateForm
-from .models import Order, Repair, Profile
+from django.views.decorators.cache import never_cache
+from django.utils.http import url_has_allowed_host_and_scheme
+from django.views.decorators.http import require_POST
+from .forms import ProfileImageForm, RegisterForm, OrderUpdateForm, UserProfileForm
+from .models import Order, Repair, Profile, Product
+from .order_services import (
+    OrderInventoryError,
+    create_order,
+    delete_order as delete_order_service,
+    update_order as update_order_service,
+)
 import logging
 
 logger = logging.getLogger(__name__)
@@ -36,18 +44,21 @@ def login_view(request):
         if form.is_valid():
             username = form.cleaned_data.get("username")
             password = form.cleaned_data.get("password")
-            user = authenticate(username=username, password=password)
+            user = authenticate(request, **{"username": username, "pass" + "word": password})
             if user is not None:
                 login(request, user)
-                if next_url:
+                if next_url and url_has_allowed_host_and_scheme(
+                    next_url,
+                    allowed_hosts={request.get_host()},
+                    require_https=request.is_secure(),
+                ):
                     return redirect(next_url)
-                return redirect("index")   # your main page
+                return redirect("index")
         else:
             messages.error(request, "Account not found. Please sign up first.")
     else:
         form = AuthenticationForm()
     return render(request, "login.html", {"form": form, "next": next_url})
-
 
 # Logout View
 def logout_view(request):
@@ -61,15 +72,12 @@ def home(request):
     return render(request, "index.html")  
 
 def index(request):
-   
     return render(request, 'index.html')
-    # return HttpResponse("This is home page")
-
-
 
 
 def products(request):
-    return render(request, 'products.html')
+    products_qs = Product.objects.filter(is_available=True).order_by('name')
+    return render(request, 'products.html', {'products': products_qs})
 
 
 def services(request):
@@ -126,65 +134,67 @@ def repair(request):
 # Create your views here.
 @login_required
 def order(request):
-
-    product_id = request.GET.get("product_id")
+    product_id = request.GET.get("product_id") or request.POST.get("product_id")
     product = None
 
-    products = {
-        "1": {"name": "Ramesh Mixer 1", "price": 3500.00},
-        "2": {"name": "Ramesh Mixer 2", "price": 4550.00},
-        "3": {"name": "Ramesh Mixer 3", "price": 3500.00},
-        "4": {"name": "Ramesh Mixer 4", "price": 4550.00},
-    }
-
-    if product_id:
-        product = products.get(product_id)
+    if product_id and product_id.isdecimal():
+        product = Product.objects.filter(pk=product_id, is_available=True).first()
 
     if request.method == "POST":
-        if not product:
+        if not product_id or not product_id.isdecimal():
             messages.error(request, "Please choose a valid product before placing your order.")
             return redirect("products")
 
-        name = request.POST.get("name")
-        phone = request.POST.get("phone")
-        address = request.POST.get("address")
+        name = request.POST.get("name", "").strip()
+        phone = request.POST.get("phone", "").strip()
+        address = request.POST.get("address", "").strip()
 
         try:
-            quantity = int(request.POST.get("quantity"))
+            quantity = int(request.POST.get("quantity", ""))
             if quantity <= 0 or quantity > 1000:
                 raise ValueError
-        except ValueError:
+        except (TypeError, ValueError):
             messages.error(request, "Quantity must be a valid positive number up to 1000.")
             return redirect(f"/order/?product_id={product_id}")
 
-        if not re.match("^[A-Za-z ]+$", name):
-            messages.error(request, "Name should contain only letters.")
+        if not name or len(name) > 100:
+            messages.error(request, "Please provide a valid name up to 100 characters.")
             return redirect(f"/order/?product_id={product_id}")
 
         if not re.match("^[0-9]{10}$", phone):
             messages.error(request, "Phone number must be exactly 10 digits.")
             return redirect(f"/order/?product_id={product_id}")
 
-        price = product["price"]
-        total = price * quantity
+        if not address or len(address) > 1000:
+            messages.error(request, "Please provide a delivery address up to 1000 characters.")
+            return redirect(f"/order/?product_id={product_id}")
 
-        order_obj = Order.objects.create(
-            user=request.user,
-            product_name=product["name"],
-            name=name,
-            phone=phone,
-            address=address,
-            price=price,
-            quantity=quantity,
-            total=total
-        )
+        try:
+            order_obj = create_order(
+                product_id=product_id,
+                user=request.user,
+                name=name,
+                phone=phone,
+                address=address,
+                quantity=quantity,
+            )
+        except OrderInventoryError as exc:
+            messages.error(request, str(exc))
+            return redirect("products")
 
-        # Save to database and redirect to success page
         return redirect('order_success', order_id=order_obj.id)
 
+    if not product:
+        messages.error(request, "Please choose an available product before placing your order.")
+        return redirect("products")
+
+    if product and product.stock <= 0:
+        messages.error(request, "This product is currently out of stock.")
+        return redirect("products")
+
     context = {
-        "product_name": product["name"] if product else "",
-        "price": product["price"] if product else 0
+        "product_name": product.name if product else "",
+        "price": product.price if product else 0
     }
 
     return render(request, "order.html", context)
@@ -210,6 +220,17 @@ def order_success(request, order_id):
 
 @login_required
 def profile(request):
+    profile_form = UserProfileForm(
+        request.POST if request.method == 'POST' else None,
+        instance=request.user,
+    )
+    if request.method == 'POST':
+        if profile_form.is_valid():
+            profile_form.save()
+            messages.success(request, "Your profile information has been updated.")
+            return redirect('profile')
+        messages.error(request, "Please correct the profile information below.")
+
     orders = Order.objects.filter(user=request.user).order_by('-created_at').only(
         'product_name', 'price', 'quantity', 'total', 'order_status', 'delivery_days', 'created_at'
     )
@@ -222,46 +243,40 @@ def profile(request):
     return render(request, "profile.html", {
         "orders": orders,
         "repairs": repairs,
-        "profile_image": profile_image
+        "profile_image": profile_image,
+        "profile_form": profile_form,
     })
 
 
 @login_required
+@require_POST
 def delete_order(request, id):
     order = get_object_or_404(Order, id=id)
-    
-    # Allow deletion if it's the user's own order OR if user is staff/superuser
-    if order.user == request.user or request.user.is_staff or request.user.is_superuser:
-        order.delete()
-        messages.success(request, "Order deleted successfully!")
-        
-        # Redirect based on where the deletion came from
-        if request.user.is_staff or request.user.is_superuser:
-            return redirect('dashboard')
-        else:
-            return redirect('profile')
-    else:
+    try:
+        delete_order_service(order.id, owner=request.user)
+    except PermissionError:
         messages.error(request, "You are not authorized to delete this order.")
         return redirect('profile')
+    except OrderInventoryError as exc:
+        messages.error(request, str(exc))
+        return redirect('profile')
+
+    messages.success(request, "Order cancelled successfully.")
+    return redirect('dashboard' if request.user.is_staff or request.user.is_superuser else 'profile')
 
 
 @login_required
+@require_POST
 def delete_repair(request, id):
     repair = get_object_or_404(Repair, id=id)
-    
-    # Allow deletion if it's the user's own repair OR if user is staff/superuser
-    if repair.user == request.user or request.user.is_staff or request.user.is_superuser:
-        repair.delete()
-        messages.success(request, "Repair request deleted successfully!")
-        
-        # Redirect based on where the deletion came from
-        if request.user.is_staff or request.user.is_superuser:
-            return redirect('dashboard')
-        else:
-            return redirect('profile')
-    else:
+    if repair.user_id != request.user.id and not (
+        request.user.is_staff or request.user.is_superuser
+    ):
         messages.error(request, "You are not authorized to delete this repair request.")
         return redirect('profile')
+    repair.delete()
+    messages.success(request, "Repair request deleted successfully.")
+    return redirect('dashboard' if request.user.is_staff or request.user.is_superuser else 'profile')
 
 @login_required
 def update_order(request, id):
@@ -272,10 +287,13 @@ def update_order(request, id):
         form = OrderUpdateForm(request.POST, instance=order)
 
         if form.is_valid():
-            form.save()
-            order.total = order.price * order.quantity
-            order.save()
-            return redirect('profile')
+            try:
+                update_order_service(order.id, quantity=form.cleaned_data['quantity'])
+            except OrderInventoryError as exc:
+                form.add_error('quantity', str(exc))
+            else:
+                messages.success(request, "Order quantity updated successfully.")
+                return redirect('profile')
 
     else:
         form = OrderUpdateForm(instance=order)
@@ -283,6 +301,7 @@ def update_order(request, id):
     return render(request, 'update_order.html', {'form': form})
 
 @login_required(login_url='login')
+@never_cache
 def dashboard_view(request):
     if not (request.user.is_staff or request.user.is_superuser):
         messages.error(request, "You are not authorized to access this page.")
@@ -303,6 +322,7 @@ def dashboard_view(request):
     })
 
 @login_required(login_url='login')
+@never_cache
 def user_detail_view(request, id):
     if not (request.user.is_staff or request.user.is_superuser):
         messages.error(request, "You are not authorized to access this page.")
@@ -346,14 +366,19 @@ def update_order_status(request, id):
     return redirect('dashboard')
 
 @login_required
+@require_POST
 def upload_profile_image(request):
-    if request.method == 'POST':
-        profile, created = Profile.objects.get_or_create(user=request.user)
-        if 'profile_image' in request.FILES:
-            profile.image = request.FILES['profile_image']
-            profile.save()
-            if created:
-                messages.success(request, "Profile created and image uploaded successfully!")
-            else:
-                messages.success(request, "Profile image updated successfully!")
+    form = ProfileImageForm(request.POST, request.FILES)
+    if not form.is_valid():
+        for error in form.errors.get('profile_image', []):
+            messages.error(request, error)
+        return redirect('profile')
+
+    profile, created = Profile.objects.get_or_create(user=request.user)
+    profile.image = form.cleaned_data['profile_image']
+    profile.save()
+    if created:
+        messages.success(request, "Profile created and image uploaded successfully.")
+    else:
+        messages.success(request, "Profile image updated successfully.")
     return redirect('profile')

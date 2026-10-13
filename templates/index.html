@@ -2,132 +2,222 @@
 {% load static %}
 
 {% block content %}
-
-<!-- Hero Section -->
 <section class="hero-section">
-  <div class="container">
-    <div class="row align-items-center">
-      <div class="col-lg-6 animate-on-scroll">
-        <h1 class="display-4 fw-bold mb-4">Welcome to Ramesh Kitchen Mixer</h1>
-        <p class="lead mb-4">Discover premium kitchen mixers, expert repair services, and unparalleled customer support. Elevate your cooking experience with our reliable products.</p>
-        <div class="d-flex flex-wrap gap-3 hero-button-group">
-          <a href="/products" class="btn btn-light btn-lg px-4 py-2">
-            <i class="fas fa-shopping-cart me-2"></i>Shop Now
-          </a>
-          <a href="/services" class="btn btn-outline-light btn-lg px-4 py-2">
-            <i class="fas fa-tools me-2"></i>Our Services
-          </a>
+    <div class="hero-shape hero-shape-one"></div>
+    <div class="hero-shape hero-shape-two"></div>
+    <div class="container hero-layout">
+        <div class="hero-copy reveal-item">
+            <span class="eyebrow">Made for the everyday kitchen</span>
+            <h1>Make more of every moment in your kitchen.</h1>
+            <p>Discover dependable mixer essentials and thoughtful local care, backed by people who know your kitchen.</p>
+            <div class="hero-actions">
+                <a href="{% url 'products' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-shopping-bag" aria-hidden="true"></i> Shop products
+                </a>
+                <a href="{% url 'repair' %}" class="btn btn-secondary btn-lg">
+                    <i class="fas fa-wrench" aria-hidden="true"></i> Book a repair
+                </a>
+            </div>
+            <div class="hero-meta">
+                <div>
+                    <strong>Local expertise</strong>
+                    <span>Friendly help from our team</span>
+                </div>
+                <div>
+                    <strong>Belhe, Maharashtra</strong>
+                    <span>Here for your kitchen</span>
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="col-lg-6 text-center animate-on-scroll mt-4 mt-lg-0">
-        <img src="{% static 'rm2.jpg' %}" alt="Premium Kitchen Mixer" class="img-fluid rounded shadow-lg" style="max-width: 80%; border-radius: 20px;">
-      </div>
+
+        <div class="hero-visual reveal-item">
+            <div class="hero-card">
+                <img src="{% static 'mixer3.jpg' %}" alt="Ramesh mixer in a warm, sunlit kitchen">
+            </div>
+        </div>
     </div>
-  </div>
 </section>
 
-<!-- Features Section -->
-<section class="py-5 bg-light">
-  <div class="container">
-    <div class="text-center mb-5">
-      <h2 class="fw-bold">Why Choose Ramesh Mixers?</h2>
-      <p class="text-muted">Quality products and services that you can trust</p>
+<section class="section-wrap section-soft category-section">
+    <div class="container">
+        <div class="section-heading reveal-item">
+            <span class="eyebrow">Explore the collection</span>
+            <h2>Good tools make every recipe feel easier.</h2>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6 col-xl-4 reveal-item">
+                <a class="category-card" href="{% url 'products' %}">
+                    <img class="category-card-image" src="{% static 'mixer1.jpg' %}" alt="Red Ramesh mixer grinder">
+                    <span class="category-card-copy">
+                        <span class="category-kicker">Find your everyday essential</span>
+                        <strong>Mixer grinders</strong>
+                        <span class="category-link">Explore collection <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+                    </span>
+                </a>
+            </div>
+            <div class="col-md-6 col-xl-4 reveal-item">
+                <a class="category-card" href="{% url 'contact' %}">
+                    <img class="category-card-image" src="{% static 'mixer2.jpg' %}" alt="Mixer grinder with stainless steel jars">
+                    <span class="category-card-copy">
+                        <span class="category-kicker">The right fit for your kitchen</span>
+                        <strong>Jars & accessories</strong>
+                        <span class="category-link">Ask our team <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+                    </span>
+                </a>
+            </div>
+            <div class="col-md-6 col-xl-4 reveal-item">
+                <a class="category-card" href="{% url 'repair' %}">
+                    <img class="category-card-image" src="{% static 'm3.jpg' %}" alt="Kitchen mixer ready for repair and care">
+                    <span class="category-card-copy">
+                        <span class="category-kicker">Friendly local expertise</span>
+                        <strong>Repair & care</strong>
+                        <span class="category-link">Book a repair <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+                    </span>
+                </a>
+            </div>
+        </div>
+
+        <div class="text-center mt-5 reveal-item">
+            <a href="{% url 'products' %}" class="btn btn-outline-primary btn-lg">Explore the product collection</a>
+        </div>
     </div>
-    <div class="row g-4">
-      <div class="col-md-4">
-        <div class="card feature-card h-100 text-center p-4">
-          <div class="card-body">
-            <i class="fas fa-star fa-3x text-warning mb-3"></i>
-            <h5 class="card-title">Premium Quality</h5>
-            <p class="card-text">High-performance mixers built to last with superior materials and craftsmanship.</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card feature-card h-100 text-center p-4">
-          <div class="card-body">
-            <i class="fas fa-tools fa-3x text-info mb-3"></i>
-            <h5 class="card-title">Expert Repairs</h5>
-            <p class="card-text">Professional repair services for all mixer brands with quick turnaround times.</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card feature-card h-100 text-center p-4">
-          <div class="card-body">
-            <i class="fas fa-headset fa-3x text-success mb-3"></i>
-            <h5 class="card-title">24/7 Support</h5>
-            <p class="card-text">Round-the-clock customer support with our AI assistant and expert team.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 </section>
 
-<!-- Stats Section -->
-<section class="py-5">
-  <div class="container">
-    <div class="row text-center">
-      <div class="col-md-3 mb-4">
-        <div class="stats-counter">1000+</div>
-        <p class="text-muted">Happy Customers</p>
-      </div>
-      <div class="col-md-3 mb-4">
-        <div class="stats-counter">50+</div>
-        <p class="text-muted">Products</p>
-      </div>
-      <div class="col-md-3 mb-4">
-        <div class="stats-counter">24/7</div>
-        <p class="text-muted">Support</p>
-      </div>
-      <div class="col-md-3 mb-4">
-        <div class="stats-counter">5★</div>
-        <p class="text-muted">Rating</p>
-      </div>
+
+
+<section class="section-wrap story-section section-soft">
+    <div class="container">
+        <div class="story-panel reveal-item">
+            <div class="story-image">
+                <img src="{% static 'mi1.jpg' %}" alt="Ramesh Mixer in a bright home kitchen">
+            </div>
+            <div class="story-copy">
+                <span class="eyebrow">From our kitchen to yours</span>
+                <h2>Reliable appliances. Real people behind the service.</h2>
+                <p>We believe choosing a mixer should feel simple, and getting help should feel even easier. Find your next kitchen essential or speak directly with our local team.</p>
+                <div class="hero-actions">
+                    <a href="{% url 'products' %}" class="btn btn-primary">Browse products</a>
+                    <a href="{% url 'contact' %}" class="btn btn-secondary">Meet your local support</a>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 </section>
 
-<!-- CTA Section -->
-<section class="cta-section">
-  <div class="container text-center">
-    <h2 class="fw-bold mb-4">Ready to Get Started?</h2>
-    <p class="lead mb-4">Join thousands of satisfied customers. Browse our products or book a repair today!</p>
-    <div class="d-flex flex-wrap justify-content-center gap-3">
-      <a href="/products" class="btn btn-light btn-lg px-4">
-        <i class="fas fa-arrow-right me-2"></i>Explore Products
-      </a>
-      <a href="/repair" class="btn btn-outline-light btn-lg px-4">
-        <i class="fas fa-wrench me-2"></i>Book Repair
-      </a>
-      <a href="/contact" class="btn btn-outline-light btn-lg px-4">
-        <i class="fas fa-envelope me-2"></i>Contact Us
-      </a>
+<section class="section-wrap section-soft">
+    <div class="container">
+        <div class="section-heading reveal-item">
+            <span class="eyebrow">Why choose us</span>
+            <h2>Built on trust, service, and real local support.</h2>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4 reveal-item">
+                <article class="info-card">
+                    <div class="icon-box"><i class="fas fa-star"></i></div>
+                    <h3>Reliable Quality</h3>
+                    <p>Every mixer is selected for durability, practical kitchen performance, and consistent customer satisfaction.</p>
+                </article>
+            </div>
+            <div class="col-md-4 reveal-item">
+                <article class="info-card">
+                    <div class="icon-box"><i class="fas fa-tools"></i></div>
+                    <h3>Expert Repairs</h3>
+                    <p>Our repair service focuses on real problems, honest recommendations, and long-term appliance care.</p>
+                </article>
+            </div>
+            <div class="col-md-4 reveal-item">
+                <article class="info-card">
+                    <div class="icon-box"><i class="fas fa-headset"></i></div>
+                    <h3>Friendly Support</h3>
+                    <p>Need help choosing a product or booking a repair? We make it simple to connect and get answers fast.</p>
+                </article>
+            </div>
+        </div>
     </div>
-  </div>
 </section>
 
-<script>
-// Simple scroll animation
-document.addEventListener('DOMContentLoaded', function() {
-  const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
-  };
+<section class="section-wrap">
+    <div class="container">
+        <div class="section-heading reveal-item">
+            <span class="eyebrow">Repair process</span>
+            <h2>Simple, clear, and customer-friendly.</h2>
+        </div>
 
-  const observer = new IntersectionObserver(function(entries) {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('animate');
-      }
-    });
-  }, observerOptions);
+        <div class="row g-4 steps-grid">
+            <div class="col-md-6 col-xl-3 reveal-item">
+                <article class="step-card">
+                    <span>01</span>
+                    <h3>Tell us the issue</h3>
+                    <p>Share the problem and your mixer details through the repair request form.</p>
+                </article>
+            </div>
+            <div class="col-md-6 col-xl-3 reveal-item">
+                <article class="step-card">
+                    <span>02</span>
+                    <h3>Review & confirm</h3>
+                    <p>We review the request and confirm the next step and repair expectations.</p>
+                </article>
+            </div>
+            <div class="col-md-6 col-xl-3 reveal-item">
+                <article class="step-card">
+                    <span>03</span>
+                    <h3>Service or repair</h3>
+                    <p>Our team handles the repair with careful attention to quality and reliability.</p>
+                </article>
+            </div>
+            <div class="col-md-6 col-xl-3 reveal-item">
+                <article class="step-card">
+                    <span>04</span>
+                    <h3>Back to use</h3>
+                    <p>Your kitchen appliance is returned ready to work smoothly and safely again.</p>
+                </article>
+            </div>
+        </div>
+    </div>
+</section>
 
-  document.querySelectorAll('.animate-on-scroll').forEach(el => {
-    observer.observe(el);
-  });
-});
-</script>
+<section class="section-wrap section-soft">
+    <div class="container">
+        <div class="section-heading reveal-item">
+            <span class="eyebrow">FAQs</span>
+            <h2>Common questions from customers.</h2>
+        </div>
 
+        <div class="faq-list reveal-item">
+            <details open>
+                <summary>Do you sell kitchen mixer grinders and spare parts?</summary>
+                <p>Yes. We offer mixer grinders and essential spare parts that support repairs and long-term use.</p>
+            </details>
+            <details>
+                <summary>Can I book a repair online?</summary>
+                <p>Yes. Use the repair form on our website and we will get in touch with the next steps.</p>
+            </details>
+            <details>
+                <summary>Do you support WhatsApp purchase enquiries?</summary>
+                <p>Yes. We encourage direct WhatsApp enquiries for quick conversation and confirmation before purchase.</p>
+            </details>
+            <details>
+                <summary>Where are you located?</summary>
+                <p>We are based in Belhe, Maharashtra 412410, and support the local community with in-person and direct contact support.</p>
+            </details>
+        </div>
+    </div>
+</section>
+
+<section class="cta-strip reveal-item">
+    <div class="container cta-strip-inner">
+        <div>
+            <span class="eyebrow">Need help today?</span>
+            <h2>Speak with our team on WhatsApp or visit the store.</h2>
+        </div>
+        <div class="cta-buttons">
+            <a href="{% url 'contact' %}" class="btn btn-light">Get in touch</a>
+            <a href="https://wa.me/919921071945?text=Hello%20Ramesh%20Kitchen%20Mixer%2C%20I%20would%20like%20to%20ask%20about%20your%20products%20or%20repair%20services." class="btn btn-whatsapp" target="_blank" rel="noopener noreferrer">
+                <i class="fab fa-whatsapp"></i> WhatsApp us
+            </a>
+        </div>
+    </div>
+</section>
 {% endblock %}

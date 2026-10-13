@@ -1,160 +1,83 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block title %}Shop Mixer Grinders | Ramesh Kitchen Mixer{% endblock %}
+
 {% block content %}
-
-<div class="container py-4">
-  <div id="carouselExample" class="carousel slide" data-bs-ride="carousel" data-bs-interval="2000">
-    <div class="carousel-inner">
-    <div class="carousel-item active">
-      <img src="{% static 'mix1.jpg' %}" class="d-block w-100 img-fluid" alt="..." style="max-height: 500px;">
+<section class="products-hero section-soft">
+    <div class="container products-hero-layout">
+        <div class="products-hero-copy reveal-item">
+            <span class="eyebrow">The Ramesh collection</span>
+            <h1>Everyday essentials, chosen with care.</h1>
+            <p>Explore our available kitchen mixers and find the right fit for your home. Need a hand? Our local team is happy to help.</p>
+            <a class="text-link" href="{% url 'contact' %}">Ask us for a recommendation <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+        </div>
+        <div class="products-hero-image reveal-item">
+            <img src="{% static 'mi1.jpg' %}" alt="A mixer grinder in a bright home kitchen">
+        </div>
     </div>
-    <div class="carousel-item">
-      <img src="{% static 'mi1.jpg' %}" class="d-block w-100 img-fluid" alt="..." style="max-height: 500px;">
+</section>
+
+<section class="section-wrap catalog-section">
+    <div class="container">
+        <div class="catalog-heading">
+            <div>
+                <span class="eyebrow">Browse all</span>
+                <h2>Kitchen mixers</h2>
+            </div>
+            <p>Product availability and prices are managed by our shop.</p>
+        </div>
+
+        <div class="catalog-result-count" aria-live="polite">
+            {{ products|length }} {% if products|length == 1 %}product{% else %}products{% endif %}
+        </div>
+
+        <div class="row g-4 product-grid" id="product-grid">
+            {% for product in products %}
+            <article class="col-md-6 col-xl-4 product-card-item">
+                <div class="product-card">
+                    <div class="product-image-wrap">
+                        {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy">
+                        {% else %}
+                        <img src="{% static 'mixer1.jpg' %}" alt="{{ product.name }}" loading="lazy">
+                        {% endif %}
+                        <span class="product-tag {% if product.stock > 0 %}is-available{% else %}is-sold-out{% endif %}">
+                            {% if product.stock > 0 %}In stock{% else %}Sold out{% endif %}
+                        </span>
+                    </div>
+                    <div class="product-info">
+                        <h3>{{ product.name }}</h3>
+                        <div class="product-price">₹{{ product.price }}</div>
+                        <div class="product-description">
+                            {{ product.description|default:'Reliable kitchen mixer built for daily cooking needs.'|safe }}
+                        </div>
+                        <p class="product-stock">
+                            {% if product.stock > 0 %}{{ product.stock }} available{% else %}Currently unavailable{% endif %}
+                        </p>
+                        <div class="product-actions">
+                            {% if user.is_authenticated and product.stock > 0 %}
+                            <a href="{% url 'order' %}?product_id={{ product.pk }}" class="btn btn-primary">Order this mixer</a>
+                            {% elif user.is_authenticated %}
+                            <span class="btn btn-disabled" aria-disabled="true">Currently sold out</span>
+                            {% else %}
+                            <a href="{% url 'order' %}?product_id={{ product.pk }}" class="btn btn-primary">Sign in to order</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </article>
+            {% empty %}
+            <div class="col-12">
+                <div class="catalog-empty-state">
+                    <span class="empty-icon" aria-hidden="true"><i class="fas fa-box-open"></i></span>
+                    <h3>Our collection is being prepared.</h3>
+                    <p>Products added by our shop will appear here.</p>
+                    <a href="{% url 'contact' %}" class="btn btn-outline-primary">Ask our team</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
     </div>
-    <div class="carousel-item">
-      <img src="{% static 'mi2.webp' %}" class="d-block w-100 img-fluid" alt="..." style="max-height: 500px;">
-    </div>
-    <div class="carousel-item">
-      <img src="{% static 'mix2.jpg' %}" class="d-block w-100 img-fluid" alt="..." style="max-height: 500px;">
-    </div>
-  </div>
-  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
-    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Previous</span>
-  </button>
-  <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
-    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Next</span>
-  </button>
-</div>
-</div>
-
-
-<!-- Section Title -->
-<div class="section2" style="color:#333; background-color:#f8f9fa; padding:60px 0;">
-
-<div class="text-center mb-5">
-<h1 class="fw-bold">All Premium Mixers</h1>
-<p class="text-muted">Explore our powerful and stylish mixer collection designed for every kitchen.</p>
-</div>
-
-<div class="container">
-<div class="row">
-
-<!-- Product 1 -->
-<div class="col-lg-3 col-md-6 col-sm-12 mb-4">
-<div class="card h-100 shadow-sm">
-
-<img src="{% static 'mixer1.jpg' %}" class="card-img-top img-fluid">
-
-<div class="card-body">
-
-
-<h5 class="card-title fw-bold">Ramesh Mixer</h5>
-
-<h6 class="text-danger fw-bold">₹3500</h6>
-
-<ul class="list-unstyled small text-muted">
-<li>✔ 900W Powerful Motor</li>
-<li>✔ 3 Stainless Steel Jars</li>
-<li>✔ 24 Month Warranty</li>
-</ul>
-
-<a href="/order?product_id=1" class="btn btn-primary w-100 mb-2">Order Now (Website)</a>
-<a href="https://wa.me/919921071945?text=Hello,%20I%20want%20to%20order%20Ramesh%20Mixer%201%20(%E2%82%B93500)" class="btn btn-success w-100">
-   <i class="fab fa-whatsapp"></i> Order on WhatsApp
-</a>
-
-</div>
-</div>
-</div>
-
-<!-- Product 2 -->
-<div class="col-lg-3 col-md-6 col-sm-12 mb-4">
-<div class="card h-100 shadow-sm">
-
-<img src="{% static 'm3.jpg' %}" class="card-img-top img-fluid">
-
-<div class="card-body">
-
-<h5 class="card-title fw-bold">Ramesh Mixer</h5>
-
-<h6 class="text-danger fw-bold">₹4550</h6>
-
-<ul class="list-unstyled small text-muted">
-<li>✔ 900W Powerful Motor</li>
-<li>✔ 3 Stainless Steel Jars</li>
-<li>✔ 24 Month Warranty</li>
-</ul>
-
-<a href="/order?product_id=2" class="btn btn-primary w-100 mb-2">Order Now (Website)</a>
-<a href="https://wa.me/919921071945?text=Hello,%20I%20want%20to%20order%20Ramesh%20Mixer%202%20(%E2%82%B94550)" class="btn btn-success w-100">
-   <i class="fab fa-whatsapp"></i> Order on WhatsApp
-</a>
-
-</div>
-</div>
-</div>
-
-<!-- Product 3 -->
-<div class="col-lg-3 col-md-6 col-sm-12 mb-4">
-<div class="card h-100 shadow-sm">
-
-<img src="{% static 'mixer2.jpg' %}" class="card-img-top img-fluid">
-
-<div class="card-body">
-
-<h5 class="card-title fw-bold">Ramesh Mixer</h5>
-
-<h6 class="text-danger fw-bold">₹3500</h6>
-
-<ul class="list-unstyled small text-muted">
-<li>✔ 900W Powerful Motor</li>
-<li>✔ 3 Stainless Steel Jars</li>
-<li>✔ 24 Month Warranty</li>
-</ul>
-
-<a href="/order?product_id=3" class="btn btn-primary w-100 mb-2">Order Now (Website)</a>
-<a href="https://wa.me/919921071945?text=Hello,%20I%20want%20to%20order%20Ramesh%20Mixer%203%20(%E2%82%B93500)" class="btn btn-success w-100">
-   <i class="fab fa-whatsapp"></i> Order on WhatsApp
-</a>
-
-</div>
-</div>
-</div>
-
-<!-- Product 4 -->
-<div class="col-lg-3 col-md-6 col-sm-12 mb-4">
-<div class="card h-100 shadow-sm">
-
-<img src="{% static 'mixer3.jpg' %}" class="card-img-top img-fluid">
-
-<div class="card-body">
-
-<h5 class="card-title fw-bold">Ramesh Mixer</h5>
-
-<h6 class="text-danger fw-bold">₹4550</h6>
-
-<ul class="list-unstyled small text-muted">
-<li>✔ 900W Powerful Motor</li>
-<li>✔ 3 Stainless Steel Jars</li>
-<li>✔ 24 Month Warranty</li>
-</ul>
-
-<a href="/order?product_id=4" class="btn btn-primary w-100 mb-2">Order Now (Website)</a>
-<a href="https://wa.me/919921071945?text=Hello,%20I%20want%20to%20order%20Ramesh%20Mixer%204%20(%E2%82%B94550)" class="btn btn-success w-100">
-   <i class="fab fa-whatsapp"></i> Order on WhatsApp
-</a>
-
-</div>
-</div>
-</div>
-
-</div>
-</div>
-</div>
-
-
- 
+</section>
 {% endblock %}

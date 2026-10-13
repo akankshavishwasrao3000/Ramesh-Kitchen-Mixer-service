@@ -21,36 +21,36 @@
               <div class="row g-4">
                 <div class="col-md-6">
                   <div class="form-floating">
-                    <input type="text" class="form-control" name="name" placeholder="Enter your full name" required>
-                    <label><i class="fas fa-user me-2"></i>Full Name</label>
+                    <input type="text" id="repair-name" class="form-control" name="name" placeholder="Enter your full name" maxlength="100" required>
+                    <label for="repair-name"><i class="fas fa-user me-2"></i>Full Name</label>
                   </div>
                 </div>
 
                 <div class="col-md-6">
                   <div class="form-floating">
-                    <input type="tel" class="form-control" name="mobile" placeholder="Enter your mobile number" required>
-                    <label><i class="fas fa-phone me-2"></i>Mobile Number</label>
+                    <input type="tel" id="repair-mobile" class="form-control" name="mobile" placeholder="Enter your mobile number" pattern="[0-9]{10,15}" maxlength="15" required>
+                    <label for="repair-mobile"><i class="fas fa-phone me-2"></i>Mobile Number</label>
                   </div>
                 </div>
 
                 <div class="col-md-6">
                   <div class="form-floating">
-                    <input type="email" class="form-control" name="email" placeholder="Enter your email">
-                    <label><i class="fas fa-envelope me-2"></i>Email Address</label>
+                    <input type="email" id="repair-email" class="form-control" name="email" placeholder="Enter your email" required>
+                    <label for="repair-email"><i class="fas fa-envelope me-2"></i>Email Address</label>
                   </div>
                 </div>
 
                 <div class="col-md-6">
                   <div class="form-floating">
-                    <input type="text" class="form-control" name="city" placeholder="Enter your city">
-                    <label><i class="fas fa-map-marker-alt me-2"></i>City</label>
+                    <input type="text" id="repair-city" class="form-control" name="city" placeholder="Enter your city" maxlength="100" required>
+                    <label for="repair-city"><i class="fas fa-map-marker-alt me-2"></i>City</label>
                   </div>
                 </div>
 
                 <div class="col-12">
                   <div class="form-floating">
-                    <textarea class="form-control" name="description" rows="4" placeholder="Describe your issue" style="height: 120px;"></textarea>
-                    <label><i class="fas fa-tools me-2"></i>Problem Description</label>
+                    <textarea id="repair-description" class="form-control" name="description" rows="4" maxlength="2000" placeholder="Describe your issue" style="height: 120px;" required></textarea>
+                    <label for="repair-description"><i class="fas fa-tools me-2"></i>Problem Description</label>
                   </div>
                 </div>
 

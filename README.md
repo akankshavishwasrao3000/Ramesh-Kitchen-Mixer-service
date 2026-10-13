@@ -7,24 +7,26 @@ Local businesses often struggle to reach a wider audience and manage service req
 
 ## ✨ Features
 *   **User Authentication**: Secure registration and login system for customers to track their activity.
-*   **Product Catalog**: Modern display of available kitchen mixers and spare parts with detailed specifications.
-*   **Order Management**: Simple order form that saves data to the database and redirects to WhatsApp for final confirmation.
+*   **Database-Managed Product Catalog**: Product names, descriptions, prices, images, stock, and availability are stored as Product records in MySQL and displayed on the storefront through Django ORM queries. Product details are not hard-coded in the product cards.
+*   **Product Administration**: The owner can add and update products, upload product images, and manage stock and availability through Django Admin.
+*   **Order Management**: The order form saves orders to the database using the selected product's current database price, then provides the existing WhatsApp confirmation workflow.
 *   **Repair Requests**: Dedicated module for users to book mixer repair services with problem descriptions.
 *   **AI Mixer Assistant**: A rule-based, lightweight chatbot to guide users through pricing, services, and location queries.
 *   **WhatsApp Integration**: Automatic message generation containing order/product details for quick business communication.
-*   **Admin Dashboard**: Powerful Django admin interface for the owner to manage products, view orders, and update statuses.
+*   **Admin Dashboard**: Django Admin interface for the owner to manage products, view orders, and update statuses.
 *   **Modern UI/UX**: Responsive design using Bootstrap 5, featuring sleek animations and a professional aesthetic.
 *   **Policy Pages**: Professional Privacy Policy, Terms & Conditions, and Shipping policies tailored for a local business.
 
 ## ⚙️ System Workflow (How it Works)
 *   **User Authentication**: The system uses Django’s built-in authentication system. Users can create a secure account, log in, and access their private profile to manage their orders and repair history.
-*   **Order Process**: When a user selects a product, they fill out an order form. Once submitted, the data is instantly saved in the **MySQL database**, and the user is redirected to **WhatsApp** with a pre-filled message containing their order details for final confirmation with the owner.
+*   **Product Process**: The products page retrieves available Product records from MySQL through the Django ORM. The homepage links to the catalog without rendering product cards. The owner manages product details and uploads images in Django Admin (`/admin/`); templates render database records rather than maintaining product names, prices, or image paths in product cards.
+*   **Order Process**: When a user selects a product, the server resolves its database ID and uses the product's current database price when saving the order. The order-success page provides a pre-filled WhatsApp message containing the order details for confirmation with the owner.
 *   **Repair Requests**: Customers can submit an online request detailing their mixer issues. These requests are stored in the database and displayed in the **Admin Panel** for the shop owner to review and manage.
 *   **Centralized Management**: The shop owner uses the **Django Admin Panel** to monitor all user activity, update order statuses (e.g., from Processing to Delivered), and manage the product inventory efficiently.
 
 ## 🛠️ Technologies Used
 *   **Backend**: Python, Django 4.2
-*   **Database**: MySQL (Production/Local), SQLite (Backup)
+*   **Database**: MySQL, configured through `MYSQL_URL`/`DATABASE_URL` or the `DB_*` environment variables
 *   **Frontend**: HTML5, CSS3, JavaScript (Vanilla), Bootstrap 5
 *   **Authentication**: Django Auth System
 *   **Environment Management**: Python-dotenv
@@ -38,24 +40,27 @@ home/
 │   ├── urls.py             # Main Route Mapping
 │   └── wsgi.py             # Web Server Entry Point
 ├── ramesh/                 # Main Business Application
-│   ├── models.py           # Database Schemas (Order, Repair, Profile)
+│   ├── models.py           # Database models (Product, Order, Repair, Profile)
 │   ├── views.py            # Business Logic & Request Handling
 │   ├── urls.py             # App-specific Routes
 │   ├── admin.py            # Admin Panel Configurations
 │   └── forms.py            # User Input Validation
 ├── templates/              # HTML Templates (Bootstrap 5)
 ├── static/                 # Static Assets (CSS, JS, Images)
-├── media/                  # User Uploads (Profile Images)
+├── media/                  # Uploaded product and profile images (local development)
 ├── requirements.txt        # Project Dependencies
 ├── .env                    # Environment Variables (Sensitive)
 └── manage.py               # Django Management Script
 ```
 
 ## 🗄️ Database Information
-The project utilizes a **MySQL** database for robust data management.
+The project uses the configured **MySQL** database for application records. Product catalog content is database-driven: product records are queried with Django ORM and rendered by the storefront templates.
+*   **Product Model**: Stores product name, slug, description, price, image, stock, availability, and timestamps. Product images are uploaded through Django Admin and stored under the configured media directory in local development.
 *   **Order Model**: Stores customer details, product info, and order status.
 *   **Repair Model**: Tracks service requests and customer contact info.
 *   **Profile Model**: Handles user-specific data and profile images.
+
+To manage storefront products, sign in with a staff or superuser account at `/admin/`, open **Products**, and add or edit records there. Mark a product as available for it to appear in the catalog. Uploaded product images are served from `MEDIA_URL` during local development; production deployments need persistent media storage configured.
 
 ## 🚀 Installation & Local Setup
 
@@ -91,9 +96,8 @@ The project utilizes a **MySQL** database for robust data management.
    DB_PORT=3306
    ```
 
-5. **Apply Migrations**:
+5. **Apply the existing migrations**:
    ```bash
-   python manage.py makemigrations
    python manage.py migrate
    ```
 
@@ -112,7 +116,7 @@ The project utilizes a **MySQL** database for robust data management.
 *   **Payment Gateway**: Manual order confirmation via WhatsApp or phone.
 *   **Order Tracking**: Real-time status updates for orders and repairs.
 *   **Notifications**: Automated email and SMS notifications for customers.
-*   **Search & Filter**: Advanced product search and category filtering.
+*   **Search & Filter**: Additional product attributes and category filtering as the catalog grows.
 *   **Customer Reviews**: Ratings and review system for products and services.
 *   **Inventory**: Automated stock management for spare parts.
 *   **Mobile App**: Dedicated Android/iOS application for easier access.

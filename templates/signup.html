@@ -9,13 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body {
-            background: linear-gradient(135deg, #36b9cc 0%, #f6c23e 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            padding: 20px;
         }
         .signup-container {
             max-width: 500px;
@@ -26,11 +20,12 @@
             border-radius: 20px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             backdrop-filter: blur(10px);
-            background: rgba(255,255,255,0.95);
+            background: rgba(24, 27, 25, 0.86);
+            color: #fff;
             overflow: hidden;
         }
         .card-header {
-            background: linear-gradient(135deg, #36b9cc 0%, #f6c23e 100%);
+            background: rgba(12, 15, 13, 0.72);
             color: white;
             text-align: center;
             padding: 30px 20px;
@@ -40,14 +35,17 @@
             margin: 0;
             font-weight: 600;
             font-size: 1.8rem;
+            color: #fff;
         }
         .card-header p {
             margin: 10px 0 0;
             opacity: 0.9;
             font-size: 1rem;
+            color: #fff;
         }
         .card-body {
             padding: 40px 30px;
+            color: #fff;
         }
         .form-floating {
             margin-bottom: 15px;
@@ -55,18 +53,26 @@
         .form-control {
             border: 2px solid #e9ecef;
             border-radius: 10px;
+            background-color: #fff;
+            color: #263238;
             padding: 12px 15px;
             font-size: 1rem;
             transition: border-color 0.3s, box-shadow 0.3s;
         }
+        .form-floating > label {
+            color: #263238;
+            opacity: 1;
+        }
         .form-control:focus {
-            border-color: #36b9cc;
-            box-shadow: 0 0 0 0.2rem rgba(54, 185, 204, 0.25);
+            border-color: #00838F;
+            box-shadow: 0 0 0 0.2rem rgba(0, 131, 143, 0.18);
         }
         .btn-custom {
-            background: linear-gradient(135deg, #36b9cc 0%, #f6c23e 100%);
+            background: #00838F;
+            background-image: none;
             border: none;
             border-radius: 10px;
+            color: #fff;
             padding: 12px;
             font-size: 1.1rem;
             font-weight: 600;
@@ -75,24 +81,39 @@
         }
         .btn-custom:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(54, 185, 204, 0.3);
+            box-shadow: 0 10px 20px rgba(0, 131, 143, 0.3);
+            color: #fff;
+        }
+        .btn-custom:focus-visible {
+            color: #fff;
+            outline: 3px solid #fff;
+            outline-offset: 3px;
         }
         .text-center a {
-            color: #36b9cc;
+            color: #80DEEA;
             text-decoration: none;
             font-weight: 500;
             transition: color 0.3s;
         }
         .text-center a:hover {
-            color: #f6c23e;
+            color: #fff;
+        }
+        .text-center p {
+            color: rgba(255, 255, 255, 0.82);
         }
         .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
             text-align: center;
             margin-bottom: 20px;
         }
         .logo img {
+            display: block;
             height: 60px;
             width: auto;
+            margin-inline: auto;
             object-fit: contain;
         }
         .text-danger {
@@ -113,13 +134,14 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="{% static 'style.css' %}?v=25">
 </head>
-<body>
+<body class="auth-screen">
     <div class="signup-container">
         <div class="card">
             <div class="card-header">
                 <div class="logo">
-                    <img src="{% static 'rm2.jpg' %}" alt="Ramesh Kitchen Mixer">
+                    <img src="{% static 'logo.jpeg' %}" alt="Ramesh Kitchen Mixer logo">
                 </div>
                 <h3>Create Account</h3>
                 <p>Join Ramesh Kitchen Mixer</p>
