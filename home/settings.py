@@ -64,31 +64,23 @@ if DEBUG and not CSRF_TRUSTED_ORIGINS:
 
 # Database configuration ----------------------------------------------------
 
-DATABASE_URL = os.getenv("MYSQL_URL") or os.getenv("DATABASE_URL")
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": os.getenv("MYSQL_DATABASE", "ramesh_mixer_db"),
+        "USER": os.getenv("MYSQL_USER", "avnadmin"),
+        "PASSWORD": os.getenv("MYSQL_PASSWORD", ""),
+        "HOST": os.getenv("MYSQL_HOST", ""),
+        "PORT": os.getenv("MYSQL_PORT", "11199"),
+        "OPTIONS": {
+            "ssl": {
+                "ca": str(BASE_DIR / "home" / "certs" / "ca.pem")
+            }
+        },
+        "CONN_MAX_AGE": 600,
+}
+}
 
-if DATABASE_URL:
-    
-    DATABASE_URL = DATABASE_URL.split("?")[0]
-
-    DATABASES = {
-        "default": dj_database_url.parse(
-            DATABASE_URL,
-            conn_max_age=600,
-            ssl_require=False,
-        )
-    }
-
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.mysql",
-            "NAME": os.getenv("DB_NAME", "home_db"),
-            "USER": os.getenv("DB_USER", "root"),
-            "PASSWORD": os.getenv("DB_PASSWORD", ""),
-            "HOST": os.getenv("DB_HOST", "127.0.0.1"),
-            "PORT": os.getenv("DB_PORT", "3306"),
-        }
-    }
 # Application definition ----------------------------------------------------
 INSTALLED_APPS = [
     "django.contrib.admin",
