@@ -64,6 +64,7 @@ if DEBUG and not CSRF_TRUSTED_ORIGINS:
 
 # Database configuration ----------------------------------------------------
 
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
@@ -78,7 +79,7 @@ DATABASES = {
             }
         },
         "CONN_MAX_AGE": 600,
-}
+    }
 }
 
 # Application definition ----------------------------------------------------
