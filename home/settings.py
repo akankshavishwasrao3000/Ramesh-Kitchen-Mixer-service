@@ -36,7 +36,7 @@ ALLOWED_HOSTS = [
     host.strip()
     for host in os.getenv(
         "ALLOWED_HOSTS",
-        "ramesh-kitchen-mixer-service-production.up.railway.app,127.0.0.1,localhost"
+        "ramesh-kitchen-mixer-service-6fuw.onrender.com,ramesh-kitchen-mixer-service-production.up.railway.app,127.0.0.1,localhost"
     ).split(',')
     if host.strip()
 ]
@@ -50,7 +50,7 @@ CSRF_TRUSTED_ORIGINS = [
     origin.strip()
     for origin in os.getenv(
         'CSRF_TRUSTED_ORIGINS',
-        'https://ramesh-kitchen-mixer-service-production.up.railway.app,http://127.0.0.1:8000,http://localhost:8000'
+        'https://ramesh-kitchen-mixer-service-6fuw.onrender.com,https://ramesh-kitchen-mixer-service-production.up.railway.app,http://127.0.0.1:8000,http://localhost:8000'
     ).split(',')
     if origin.strip()
 ]
