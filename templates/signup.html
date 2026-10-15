@@ -12,81 +12,87 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         .signup-container {
-            max-width: 500px;
+            max-width: 560px;
             width: 100%;
+            justify-self: center;
+            align-self: center;
         }
-        .card {
-            border: none;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            backdrop-filter: blur(10px);
-            background: rgba(24, 27, 25, 0.86);
+        .signup-card {
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            border-radius: 18px;
+            box-shadow: 0 22px 56px rgba(19, 26, 22, 0.24);
+            background: #191c1a;
             color: #fff;
             overflow: hidden;
         }
         .card-header {
-            background: rgba(12, 15, 13, 0.72);
+            background: #151816;
             color: white;
             text-align: center;
-            padding: 30px 20px;
+            padding: 24px 24px 20px;
             border-bottom: none;
         }
         .card-header h3 {
             margin: 0;
-            font-weight: 600;
-            font-size: 1.8rem;
+            font-weight: 650;
+            font-size: 1.55rem;
+            letter-spacing: -0.025em;
             color: #fff;
         }
         .card-header p {
-            margin: 10px 0 0;
-            opacity: 0.9;
-            font-size: 1rem;
-            color: #fff;
+            margin: 6px 0 0;
+            color: #bdc8c2;
+            font-size: 0.9rem;
         }
         .card-body {
-            padding: 40px 30px;
+            padding: 24px 30px 26px;
             color: #fff;
         }
         .form-floating {
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
-        .form-control {
-            border: 2px solid #e9ecef;
-            border-radius: 10px;
+        .signup-form .form-control {
+            min-height: 56px;
+            border: 1px solid #d7e0dc;
+            border-radius: 9px;
             background-color: #fff;
             color: #263238;
-            padding: 12px 15px;
-            font-size: 1rem;
-            transition: border-color 0.3s, box-shadow 0.3s;
+            padding: 1rem 0.85rem 0.35rem;
+            font-size: 0.94rem;
+            transition: border-color 0.18s ease, box-shadow 0.18s ease;
         }
-        .form-floating > label {
-            color: #263238;
+        .signup-form .form-floating > label {
+            color: #586663;
             opacity: 1;
         }
-        .form-control:focus {
+        .signup-form .form-floating > label i {
+            color: #52706a;
+        }
+        .signup-form .form-control:focus {
             border-color: #00838F;
-            box-shadow: 0 0 0 0.2rem rgba(0, 131, 143, 0.18);
+            box-shadow: 0 0 0 3px rgba(0, 131, 143, 0.17);
         }
         .btn-custom {
             background: #00838F;
             background-image: none;
             border: none;
-            border-radius: 10px;
+            border-radius: 9px;
             color: #fff;
-            padding: 12px;
-            font-size: 1.1rem;
+            padding: 11px 14px;
+            font-size: 1rem;
             font-weight: 600;
-            transition: transform 0.2s, box-shadow 0.2s;
+            letter-spacing: 0.01em;
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
             width: 100%;
         }
         .btn-custom:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0, 131, 143, 0.3);
+            transform: translateY(-1px);
+            box-shadow: 0 7px 16px rgba(0, 131, 143, 0.24);
             color: #fff;
         }
         .btn-custom:focus-visible {
             color: #fff;
-            outline: 3px solid #fff;
+            outline: 3px solid #80DEEA;
             outline-offset: 3px;
         }
         .text-center a {
@@ -99,7 +105,8 @@
             color: #fff;
         }
         .text-center p {
-            color: rgba(255, 255, 255, 0.82);
+            color: #bdc8c2;
+            font-size: 0.88rem;
         }
         .logo {
             display: flex;
@@ -107,30 +114,160 @@
             justify-content: center;
             width: 100%;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 14px;
         }
         .logo img {
             display: block;
-            height: 60px;
+            height: 48px;
             width: auto;
             margin-inline: auto;
             object-fit: contain;
         }
-        .text-danger {
-            font-size: 0.875rem;
+        .signup-field-feedback {
+            margin: -4px 0 8px;
+            color: #f1b8bd;
+            font-size: 0.78rem;
+            line-height: 1.4;
+        }
+        .signup-field-feedback:empty {
+            display: none;
+        }
+        .signup-field-feedback .feedback-message {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.45rem;
+        }
+        .signup-field-feedback i {
+            margin-top: 0.1rem;
+            flex: 0 0 auto;
+        }
+        .password-help {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            width: 100%;
+            margin: 4px 0 8px;
+            padding: 12px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.035);
+            color: #c3ccc7;
+            font-size: 0.75rem;
+            line-height: 1.5;
+        }
+        .password-help-heading {
+            flex: 0 0 180px;
+            color: #e2e9e5;
+            font-weight: 600;
+        }
+        .password-help ul {
+            display: flex;
+            flex: 1;
+            flex-wrap: wrap;
+            gap: 5px 18px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        .password-help li {
+            position: relative;
+            flex: 1 1 145px;
+            padding-left: 12px;
+        }
+        .password-help li::before {
+            position: absolute;
+            left: 1px;
+            color: #80c8bc;
+            content: "•";
+        }
+        .password-strength {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.45rem;
+            margin: 0 0 9px;
+            color: #c3ccc7;
+            font-size: 0.74rem;
+        }
+        .password-strength[hidden],
+        .password-help[hidden] {
+            display: none;
+        }
+        .strength-meter {
+            display: flex;
+            gap: 4px;
+            width: 48px;
+        }
+        .strength-meter span {
+            height: 3px;
+            flex: 1;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.24);
+        }
+        .strength-meter[data-strength="1"] span:nth-child(1) {
+            background: #f0a2a8;
+        }
+        .strength-meter[data-strength="2"] span:nth-child(-n+2) {
+            background: #f2d28b;
+        }
+        .strength-meter[data-strength="3"] span {
+            background: #8bd3ad;
+        }
+        .password-status {
+            font-weight: 600;
+        }
+        .password-status[data-strength="1"] {
+            color: #f1b8bd;
+        }
+        .password-status[data-strength="2"] {
+            color: #f1d697;
+        }
+        .password-status[data-strength="3"] {
+            color: #9fe0b7;
+        }
+        .signup-form .form-control.is-invalid {
+            border-color: #e3a1a7;
+        }
+        .signup-form .form-control.is-valid {
+            border-color: #82c9a0;
+        }
+        .signup-form .row {
+            --bs-gutter-x: 0.85rem;
+        }
+        .signup-form > .row + .row {
+            margin-top: 2px;
+        }
+        .password-guidance-column {
+            padding-top: 0;
         }
         @media (max-width: 576px) {
+            .signup-container {
+                max-width: 430px;
+            }
             .card-header {
-                padding: 20px;
+                padding: 20px 18px 17px;
             }
             .card-header h3 {
-                font-size: 1.5rem;
+                font-size: 1.4rem;
             }
             .card-body {
-                padding: 30px 20px;
+                padding: 20px 18px 22px;
             }
             .btn-custom {
-                font-size: 1rem;
+                font-size: 0.96rem;
+            }
+            .password-help {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 5px;
+                padding: 10px 12px;
+            }
+            .password-help-heading {
+                flex-basis: auto;
+            }
+            .password-help ul {
+                display: grid;
+                gap: 3px;
             }
         }
     </style>
@@ -138,7 +275,7 @@
 </head>
 <body class="auth-screen">
     <div class="signup-container">
-        <div class="card">
+        <div class="card signup-card">
             <div class="card-header">
                 <div class="logo">
                     <img src="{% static 'logo.jpeg' %}" alt="Ramesh Kitchen Mixer logo">
@@ -147,54 +284,94 @@
                 <p>Join Ramesh Kitchen Mixer</p>
             </div>
             <div class="card-body">
-                <form method="POST">
+                <form method="POST" class="signup-form">
                     {% csrf_token %}
+                    {% if form.non_field_errors %}
+                        <div class="signup-field-feedback mb-3" role="alert">
+                            {% for error in form.non_field_errors %}
+                                <div class="feedback-message"><i class="fas fa-circle-exclamation" aria-hidden="true"></i><span>{{ error }}</span></div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating">
-                                <input type="text" class="form-control" id="first_name" name="first_name" placeholder="First Name" value="{{ form.first_name.value|default:'' }}" required>
-                                <label for="first_name"><i class="fas fa-user me-2"></i>First Name</label>
+                                <input type="text" class="form-control{% if form.first_name.errors %} is-invalid{% endif %}" id="first_name" name="first_name" placeholder="First Name" value="{{ form.first_name.value|default:'' }}" aria-describedby="first-name-feedback" aria-invalid="{% if form.first_name.errors %}true{% else %}false{% endif %}" required>
+                                <label for="first_name"><i class="fas fa-user me-2" aria-hidden="true"></i>First Name</label>
                             </div>
-                            <div class="text-danger small">{{ form.first_name.errors }}</div>
+                            <div class="signup-field-feedback" id="first-name-feedback" aria-live="polite">
+                                {% for error in form.first_name.errors %}<div class="feedback-message"><i class="fas fa-circle-exclamation" aria-hidden="true"></i><span>{{ error }}</span></div>{% endfor %}
+                            </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating">
-                                <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Last Name" value="{{ form.last_name.value|default:'' }}">
-                                <label for="last_name"><i class="fas fa-user me-2"></i>Last Name</label>
+                                <input type="text" class="form-control{% if form.last_name.errors %} is-invalid{% endif %}" id="last_name" name="last_name" placeholder="Last Name" value="{{ form.last_name.value|default:'' }}" aria-describedby="last-name-feedback" aria-invalid="{% if form.last_name.errors %}true{% else %}false{% endif %}">
+                                <label for="last_name"><i class="fas fa-user me-2" aria-hidden="true"></i>Last Name</label>
                             </div>
-                            <div class="text-danger small">{{ form.last_name.errors }}</div>
+                            <div class="signup-field-feedback" id="last-name-feedback" aria-live="polite">
+                                {% for error in form.last_name.errors %}<div class="feedback-message"><i class="fas fa-circle-exclamation" aria-hidden="true"></i><span>{{ error }}</span></div>{% endfor %}
+                            </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating">
-                                <input type="text" class="form-control" id="username" name="username" placeholder="Username" value="{{ form.username.value|default:'' }}" required>
-                                <label for="username"><i class="fas fa-at me-2"></i>Username</label>
+                                <input type="text" class="form-control{% if form.username.errors %} is-invalid{% endif %}" id="username" name="username" placeholder="Username" value="{{ form.username.value|default:'' }}" aria-describedby="username-feedback" aria-invalid="{% if form.username.errors %}true{% else %}false{% endif %}" required>
+                                <label for="username"><i class="fas fa-at me-2" aria-hidden="true"></i>Username</label>
                             </div>
-                            <div class="text-danger small">{{ form.username.errors }}</div>
+                            <div class="signup-field-feedback" id="username-feedback" aria-live="polite">
+                                {% for error in form.username.errors %}
+                                    <div class="feedback-message"><i class="fas fa-circle-exclamation" aria-hidden="true"></i><span>{% if error == "A user with that username already exists." %}This username is already taken. Try another one.{% else %}{{ error }}{% endif %}</span></div>
+                                {% endfor %}
+                            </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating">
-                                <input type="email" class="form-control" id="email" name="email" placeholder="Email" value="{{ form.email.value|default:'' }}" required>
-                                <label for="email"><i class="fas fa-envelope me-2"></i>Email</label>
+                                <input type="email" class="form-control{% if form.email.errors %} is-invalid{% endif %}" id="email" name="email" placeholder="Email" value="{{ form.email.value|default:'' }}" aria-describedby="email-feedback" aria-invalid="{% if form.email.errors %}true{% else %}false{% endif %}" required>
+                                <label for="email"><i class="fas fa-envelope me-2" aria-hidden="true"></i>Email</label>
                             </div>
-                            <div class="text-danger small">{{ form.email.errors }}</div>
+                            <div class="signup-field-feedback" id="email-feedback" aria-live="polite">
+                                {% for error in form.email.errors %}<div class="feedback-message"><i class="fas fa-circle-exclamation" aria-hidden="true"></i><span>{{ error }}</span></div>{% endfor %}
+                            </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating">
-                                <input type="password" class="form-control" id="password1" name="password1" placeholder="Password" required>
-                                <label for="password1"><i class="fas fa-lock me-2"></i>Password</label>
+                                <input type="password" class="form-control{% if form.password1.errors %} is-invalid{% endif %}" id="password1" name="password1" placeholder="Password" aria-describedby="password-help password-strength password1-feedback" aria-invalid="{% if form.password1.errors %}true{% else %}false{% endif %}" required>
+                                <label for="password1"><i class="fas fa-lock me-2" aria-hidden="true"></i>Password</label>
                             </div>
-                            <div class="text-danger small">{{ form.password1.errors }}</div>
+                            <div class="password-strength" id="password-strength" aria-live="polite" hidden>
+                                <span>Password strength:</span>
+                                <div class="strength-meter" id="strength-meter" data-strength="0" role="meter" aria-label="Password strength" aria-valuemin="0" aria-valuemax="3" aria-valuetext="Not entered">
+                                    <span></span><span></span><span></span>
+                                </div>
+                                <span class="password-status" id="strength-label"></span>
+                            </div>
+                            <div class="signup-field-feedback" id="password1-feedback" aria-live="polite">
+                                {% for error in form.password1.errors %}<div class="feedback-message"><i class="fas fa-circle-exclamation" aria-hidden="true"></i><span>{{ error }}</span></div>{% endfor %}
+                            </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating">
-                                <input type="password" class="form-control" id="password2" name="password2" placeholder="Confirm Password" required>
-                                <label for="password2"><i class="fas fa-lock me-2"></i>Confirm Password</label>
+                                <input type="password" class="form-control{% if form.password2.errors %} is-invalid{% endif %}" id="password2" name="password2" placeholder="Confirm Password" aria-describedby="password2-feedback" aria-invalid="{% if form.password2.errors %}true{% else %}false{% endif %}" required>
+                                <label for="password2"><i class="fas fa-lock me-2" aria-hidden="true"></i>Confirm Password</label>
                             </div>
-                            <div class="text-danger small">{{ form.password2.errors }}</div>
+                            <div class="signup-field-feedback" id="password2-feedback" aria-live="polite">
+                                {% for error in form.password2.errors %}
+                                    <div class="feedback-message"><i class="fas fa-circle-exclamation" aria-hidden="true"></i><span>{% if error == "The two password fields didn’t match." %}Passwords do not match{% else %}{{ error }}{% endif %}</span></div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-12 password-guidance-column">
+                            <div class="password-help" id="password-help" data-server-error="{% if form.password1.errors or form.password2.errors %}true{% else %}false{% endif %}" {% if not form.password1.errors and not form.password2.errors %}hidden{% endif %}>
+                                <div class="password-help-heading"><i class="fas fa-circle-info me-1" aria-hidden="true"></i>Choose a password that’s hard to guess:</div>
+                                <ul>
+                                    <li>At least 8 characters</li>
+                                    <li>Avoid common or easily guessed passwords</li>
+                                    <li>Use a mix of letters, numbers, and symbols where appropriate</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                     <button type="submit" class="btn btn-custom mt-3">Create Account</button>
@@ -206,5 +383,90 @@
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const password = document.getElementById('password1');
+            const confirmation = document.getElementById('password2');
+            const username = document.getElementById('username');
+            const meter = document.getElementById('strength-meter');
+            const strengthLabel = document.getElementById('strength-label');
+            const passwordFeedback = document.getElementById('password1-feedback');
+            const confirmationFeedback = document.getElementById('password2-feedback');
+            const passwordHelp = document.getElementById('password-help');
+            const passwordStrength = document.getElementById('password-strength');
+            let hasServerPasswordError = passwordHelp.dataset.serverError === 'true';
+
+            function clearFeedback(input, feedback) {
+                feedback.textContent = '';
+                input.classList.remove('is-invalid', 'is-valid');
+                input.setAttribute('aria-invalid', 'false');
+            }
+
+            function updateStrength() {
+                const value = password.value;
+                passwordStrength.hidden = !value;
+                let score = 0;
+                if (value.length >= 8) score++;
+                if (/[a-z]/.test(value) && /[A-Z]/.test(value)) score++;
+                if (/\d/.test(value) && /[^A-Za-z0-9]/.test(value)) score++;
+                if (/^(.)\1+$/.test(value) || /^(password|12345678|qwerty|letmein)/i.test(value)) score = Math.min(score, 1);
+
+                if (!value) {
+                    passwordHelp.hidden = !hasServerPasswordError;
+                    return;
+                }
+
+                const strength = score <= 1 ? 1 : score === 2 ? 2 : 3;
+                const labels = ['', 'Weak', 'Medium', 'Strong'];
+                passwordHelp.hidden = strength !== 1 && !hasServerPasswordError;
+                meter.dataset.strength = String(strength);
+                meter.setAttribute('aria-valuenow', String(strength));
+                meter.setAttribute('aria-valuetext', labels[strength]);
+                strengthLabel.dataset.strength = String(strength);
+                strengthLabel.textContent = labels[strength];
+            }
+
+            function updateConfirmation() {
+                if (!confirmation.value) {
+                    clearFeedback(confirmation, confirmationFeedback);
+                    return;
+                }
+                if (confirmation.value !== password.value) {
+                    confirmationFeedback.innerHTML = '<div class="feedback-message"><i class="fas fa-circle-exclamation" aria-hidden="true"></i><span>Passwords do not match</span></div>';
+                    confirmation.classList.add('is-invalid');
+                    confirmation.classList.remove('is-valid');
+                    confirmation.setAttribute('aria-invalid', 'true');
+                    return;
+                }
+                clearFeedback(confirmation, confirmationFeedback);
+                confirmation.classList.add('is-valid');
+            }
+
+            password.addEventListener('input', function () {
+                hasServerPasswordError = false;
+                clearFeedback(password, passwordFeedback);
+                updateStrength();
+                if (confirmation.value) updateConfirmation();
+            });
+            confirmation.addEventListener('input', updateConfirmation);
+            username.addEventListener('input', function () {
+                const feedback = document.getElementById('username-feedback');
+                clearFeedback(username, feedback);
+            });
+            [
+                ['first_name', 'first-name-feedback'],
+                ['last_name', 'last-name-feedback'],
+                ['email', 'email-feedback']
+            ].forEach(function ([fieldId, feedbackId]) {
+                const input = document.getElementById(fieldId);
+                input.addEventListener('input', function () {
+                    if (input.checkValidity()) {
+                        clearFeedback(input, document.getElementById(feedbackId));
+                    }
+                });
+            });
+            updateStrength();
+        });
+    </script>
 </body>
 </html>

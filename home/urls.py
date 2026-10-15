@@ -24,9 +24,9 @@ urlpatterns = [
     path('',include('ramesh.urls'))
 ]
 
-admin.site.site_header = "Ramesh Mixer Admin" # The text in the <h1> (and above login form)
-admin.site.site_title = "Ramesh Mixer Admin Portal"     # The text in the HTML <title> tag
-admin.site.index_title = "Welcome to Ramesh Mixer Services" # The heading on the admin index page
+admin.site.site_header = "Ramesh Mixer Admin" 
+admin.site.site_title = "Ramesh Mixer Admin Portal"
+admin.site.index_title = "Welcome to Ramesh Mixer Services"
 
 
 

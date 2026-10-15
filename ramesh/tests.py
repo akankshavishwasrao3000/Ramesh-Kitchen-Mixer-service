@@ -97,6 +97,60 @@ class AppFlowTests(TestCase):
         self.assertRedirects(response, reverse('login'))
         self.assertTrue(User.objects.filter(username='janedoe').exists())
 
+    def test_signup_shows_existing_username_as_inline_message(self):
+        response = self.client.post(
+            reverse('signup'),
+            {
+                'first_name': 'Jane',
+                'last_name': 'Doe',
+                'username': 'john',
+                'email': 'jane@example.com',
+                'password1': 'GoodPass123!',
+                'password2': 'GoodPass123!',
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'This username is already taken. Try another one.')
+        self.assertContains(response, 'id="username-feedback"')
+        self.assertNotContains(response, '<ul class="errorlist">')
+
+    def test_signup_shows_password_mismatch_inline_message(self):
+        response = self.client.post(
+            reverse('signup'),
+            {
+                'first_name': 'Jane',
+                'last_name': 'Doe',
+                'username': 'janedoe',
+                'email': 'jane@example.com',
+                'password1': 'GoodPass123!',
+                'password2': 'DifferentPass123!',
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Passwords do not match')
+        self.assertContains(response, 'id="strength-meter"')
+        self.assertNotContains(response, '<ul class="errorlist">')
+
+    def test_signup_shows_full_width_password_guidance_for_weak_password(self):
+        response = self.client.post(
+            reverse('signup'),
+            {
+                'first_name': 'Jane',
+                'last_name': 'Doe',
+                'username': 'janedoe',
+                'email': 'jane@example.com',
+                'password1': 'admin',
+                'password2': 'admin',
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'At least 8 characters')
+        self.assertContains(response, 'id="password-help" data-server-error="true"')
+        self.assertNotContains(response, 'id="password-help" data-server-error="true" hidden')
+
     def test_signup_page_does_not_render_product_catalog(self):
         response = self.client.get(reverse('signup'))
 
@@ -108,6 +162,7 @@ class AppFlowTests(TestCase):
         self.assertContains(response, 'Create Account</button>')
         self.assertContains(response, '/static/logo.')
         self.assertContains(response, 'background-image: none;')
+        self.assertContains(response, 'id="password-help" data-server-error="false" hidden')
 
     def test_login_page_has_readable_labels_button_and_site_logo(self):
         response = self.client.get(reverse('login'))

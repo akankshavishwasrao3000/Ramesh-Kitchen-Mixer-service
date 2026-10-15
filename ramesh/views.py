@@ -22,7 +22,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-# Signup View
+
 def signup_view(request):
     if request.method == "POST":
         form = RegisterForm(request.POST)
@@ -35,7 +35,7 @@ def signup_view(request):
     return render(request, "signup.html", {"form": form})
 
 
-# Login View
+
 def login_view(request):
     next_url = request.GET.get('next') or request.POST.get('next')
 
@@ -60,13 +60,13 @@ def login_view(request):
         form = AuthenticationForm()
     return render(request, "login.html", {"form": form, "next": next_url})
 
-# Logout View
+
 def logout_view(request):
     logout(request)
     return redirect("login")
 
 
-# Protect Home Page
+
 @login_required
 def home(request):
     return render(request, "index.html")  
@@ -131,7 +131,7 @@ def repair(request):
 
     return render(request, "repair.html")
 
-# Create your views here.
+
 @login_required
 def order(request):
     product_id = request.GET.get("product_id") or request.POST.get("product_id")
@@ -203,11 +203,11 @@ def order(request):
 def order_success(request, order_id):
     order_obj = get_object_or_404(Order, id=order_id, user=request.user)
     
-    # WhatsApp details
-    whatsapp_number = "919921071945"  # As found in contact.html
+   
+    whatsapp_number = "919921071945"  
     message = f"Hello, I have placed an order for {order_obj.product_name}.\nName: {order_obj.name}\nMobile: {order_obj.phone}\n\nPlease contact me regarding this order."
     
-    # URL encode the message
+   
     import urllib.parse
     encoded_message = urllib.parse.quote(message)
     whatsapp_url = f"https://wa.me/{whatsapp_number}?text={encoded_message}"

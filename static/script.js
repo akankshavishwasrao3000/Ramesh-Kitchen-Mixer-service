@@ -1,4 +1,3 @@
-// Simple rule-based chatbot for Ramesh Kitchen Mixer
 let chatInitialized = false;
 
 function toggleChat() {

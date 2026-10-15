@@ -20,7 +20,7 @@ urlpatterns = [
     path('repair/', views.repair, name='repair'),
     path('order/', views.order, name='order'),
     
-    # Order Success URL
+  
     path('order/success/<int:order_id>/', views.order_success, name='order_success'),
 
     path('profile/', views.profile, name='profile'),

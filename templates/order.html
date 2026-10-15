@@ -6,7 +6,7 @@
 <section class="py-5 bg-light">
   <div class="container">
 
-    <!-- Title -->
+    
     <div class="text-center mb-5">
       <h2 class="fw-bold mb-3">Place Your Order</h2>
       <p class="text-muted fs-5">Complete your purchase securely</p>
@@ -24,7 +24,7 @@
 
               <div class="row g-4">
 
-                <!-- Product Name -->
+                
                 <div class="col-md-6">
                   <div class="form-floating">
                     <input type="text" id="product-name" name="product_name" class="form-control" value="{{ product_name }}" readonly>
@@ -32,7 +32,7 @@
                   </div>
                 </div>
 
-                <!-- Price -->
+              
                 <div class="col-md-6">
                   <div class="form-floating">
                     <input type="number" name="price" id="price" class="form-control" value="{{ price }}" readonly>
@@ -40,7 +40,7 @@
                   </div>
                 </div>
 
-                <!-- Quantity -->
+              
                 <div class="col-md-6">
                   <div class="form-floating">
                     <input type="number" name="quantity" id="quantity" class="form-control" value="1" min="1" max="1000" required>
@@ -48,7 +48,7 @@
                   </div>
                 </div>
 
-                <!-- Total -->
+                
                 <div class="col-md-6">
                   <div class="form-floating">
                     <input type="number" name="total" id="total" class="form-control" readonly>
@@ -58,7 +58,7 @@
 
                 <hr class="my-4">
 
-                <!-- Customer Name -->
+                
                 <div class="col-md-6">
                   <div class="form-floating">
                     <input type="text" id="customer-name" name="name" class="form-control" placeholder="Enter your full name" pattern="[A-Za-z][A-Za-z .'-]*" maxlength="100" required>
@@ -66,7 +66,7 @@
                   </div>
                 </div>
 
-                <!-- Phone -->
+                
                 <div class="col-md-6">
                   <div class="form-floating">
                     <input type="tel" id="customer-phone" name="phone" class="form-control" placeholder="Enter phone number" pattern="[0-9]{10}" maxlength="10" required>
@@ -74,7 +74,7 @@
                   </div>
                 </div>
 
-                <!-- Address -->
+                
                 <div class="col-12">
                   <div class="form-floating">
                     <textarea id="customer-address" name="address" class="form-control" style="height:120px;" maxlength="1000" placeholder="Enter your full address" required></textarea>
@@ -82,7 +82,7 @@
                   </div>
                 </div>
 
-                <!-- Submit Button -->
+               
                 <div class="col-12 d-grid">
                   <button type="submit" class="btn btn-success btn-lg mb-2">
                     <i class="fas fa-check-circle me-2"></i>Confirm Order
@@ -92,7 +92,7 @@
                   </a>
                 </div>
 
-<!-- Success / Error Message -->
+
                 {% if messages %}
                   {% for message in messages %}
                     {% if message.tags == 'error' %}
@@ -124,7 +124,7 @@
   </div>
 </section>
 
-<!-- JavaScript for Total Calculation -->
+
 <script>
 const priceInput = document.getElementById("price");
 const quantityInput = document.getElementById("quantity");
