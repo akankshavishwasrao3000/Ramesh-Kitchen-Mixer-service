@@ -2,6 +2,8 @@ from django.core.exceptions import ValidationError
 from django.core.files.storage import default_storage
 from django.db import models, transaction
 from django.contrib.auth.models import User
+from cloudinary.exceptions import Error as CloudinaryError
+from requests.exceptions import RequestException
 from django.utils.text import slugify
 import logging
 
@@ -11,17 +13,34 @@ from .validators import validate_image_upload
 logger = logging.getLogger(__name__)
 
 
-def delete_unreferenced_image(image_name):
+def delete_unreferenced_image(image_name, using=None):
     if not image_name:
-        return
-    if Product.objects.filter(image=image_name).exists():
-        return
-    if Profile.objects.filter(image=image_name).exists():
-        return
+        return False
+    database = using or 'default'
+    if Product.objects.using(database).filter(image=image_name).exists():
+        return False
+    if Profile.objects.using(database).filter(image=image_name).exists():
+        return False
     try:
-        default_storage.delete(image_name)
-    except OSError:
+        deleted = default_storage.delete(image_name)
+    except (CloudinaryError, OSError, RequestException):
         logger.exception("Could not delete unreferenced image %s", image_name)
+        return False
+    if deleted is True:
+        return True
+    if deleted is None:
+        try:
+            if not default_storage.exists(image_name):
+                return True
+        except (CloudinaryError, OSError, RequestException):
+            logger.exception("Could not verify deletion of image %s", image_name)
+            return False
+    logger.error(
+        "Storage did not confirm deletion of unreferenced image %s (result=%r)",
+        image_name,
+        deleted,
+    )
+    return False
 
 
 class Product(models.Model):
@@ -62,13 +81,6 @@ class Product(models.Model):
         self.full_clean()
         result = super().save(*args, **kwargs)
         if old_image_name and old_image_name != self.image.name:
-            transaction.on_commit(lambda: delete_unreferenced_image(old_image_name))
-        return result
-
-    def delete(self, *args, **kwargs):
-        old_image_name = self.image.name if self.image else None
-        result = super().delete(*args, **kwargs)
-        if old_image_name:
             transaction.on_commit(lambda: delete_unreferenced_image(old_image_name))
         return result
 

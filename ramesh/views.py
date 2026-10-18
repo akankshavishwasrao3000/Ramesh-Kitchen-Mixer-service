@@ -220,16 +220,27 @@ def order_success(request, order_id):
 
 @login_required
 def profile(request):
+    image_submission = request.method == 'POST' and 'profile_image' in request.FILES
+    profile_form_submission = request.method == 'POST' and (
+        not image_submission
+        or any(field in request.POST for field in UserProfileForm.Meta.fields)
+    )
     profile_form = UserProfileForm(
-        request.POST if request.method == 'POST' else None,
+        request.POST if profile_form_submission else None,
         instance=request.user,
     )
+    if image_submission:
+        _handle_profile_image_upload(request)
+
     if request.method == 'POST':
-        if profile_form.is_valid():
+        if profile_form_submission and profile_form.is_valid():
             profile_form.save()
             messages.success(request, "Your profile information has been updated.")
             return redirect('profile')
-        messages.error(request, "Please correct the profile information below.")
+        if profile_form_submission:
+            messages.error(request, "Please correct the profile information below.")
+        elif image_submission:
+            return redirect('profile')
 
     orders = Order.objects.filter(user=request.user).order_by('-created_at').only(
         'product_name', 'price', 'quantity', 'total', 'order_status', 'delivery_days', 'created_at'
@@ -365,14 +376,12 @@ def update_order_status(request, id):
         return redirect('user_detail', id=order.user_id)
     return redirect('dashboard')
 
-@login_required
-@require_POST
-def upload_profile_image(request):
+def _handle_profile_image_upload(request):
     form = ProfileImageForm(request.POST, request.FILES)
     if not form.is_valid():
         for error in form.errors.get('profile_image', []):
             messages.error(request, error)
-        return redirect('profile')
+        return
 
     profile, created = Profile.objects.get_or_create(user=request.user)
     profile.image = form.cleaned_data['profile_image']
@@ -381,4 +390,10 @@ def upload_profile_image(request):
         messages.success(request, "Profile created and image uploaded successfully.")
     else:
         messages.success(request, "Profile image updated successfully.")
+
+
+@login_required
+@require_POST
+def upload_profile_image(request):
+    _handle_profile_image_upload(request)
     return redirect('profile')

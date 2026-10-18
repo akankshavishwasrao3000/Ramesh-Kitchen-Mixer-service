@@ -4,3 +4,6 @@ from django.apps import AppConfig
 class HarryConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'ramesh'
+
+    def ready(self):
+        from . import signals

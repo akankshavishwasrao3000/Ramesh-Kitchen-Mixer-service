@@ -3,18 +3,22 @@ from decimal import Decimal
 from pathlib import Path
 import re
 from tempfile import TemporaryDirectory
+from unittest.mock import patch
 
+from cloudinary.exceptions import Error as CloudinaryError
+from django.contrib import admin
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.exceptions import ValidationError
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.db import transaction
 from django.templatetags.static import static
-from django.test import Client, TestCase, override_settings
+from django.test import Client, RequestFactory, TestCase, override_settings
 from django.urls import reverse
 from PIL import Image
 
 from .forms import ProfileImageForm
-from .models import Order, Product, Profile, Repair
+from .models import Order, Product, Profile, Repair, delete_unreferenced_image
 from .order_services import create_order, delete_order
 from .validators import MAX_IMAGE_SIZE, validate_image_upload
 
@@ -544,6 +548,159 @@ class ImageHandlingTests(TestCase):
         self.assertTrue(Path(profile.image.path).exists())
         self.assertFalse(Path(old_path).exists())
 
+    def test_image_replacement_cleanup_is_discarded_on_transaction_rollback(self):
+        profile = Profile.objects.create(user=self.user, image=make_test_image('original.png'))
+        old_name = profile.image.name
+        old_path = profile.image.path
+
+        with self.assertRaisesMessage(RuntimeError, 'rollback'):
+            with transaction.atomic():
+                profile.image = make_test_image('replacement.png')
+                profile.save()
+                new_path = profile.image.path
+                raise RuntimeError('rollback')
+
+        profile.refresh_from_db()
+        self.assertEqual(profile.image.name, old_name)
+        self.assertTrue(Path(old_path).exists())
+        self.assertTrue(Path(new_path).exists())
+
+    def test_logout_preserves_user_profile_and_profile_image(self):
+        profile = Profile.objects.create(user=self.user, image=make_test_image())
+        image_name = profile.image.name
+        image_path = profile.image.path
+        client = Client()
+        client.force_login(self.user)
+
+        response = client.get(reverse('logout'))
+
+        self.assertRedirects(response, reverse('login'))
+        self.assertNotIn('_auth_user_id', client.session)
+        self.assertTrue(User.objects.filter(pk=self.user.pk).exists())
+        profile.refresh_from_db()
+        self.assertEqual(profile.image.name, image_name)
+        self.assertTrue(Path(image_path).exists())
+
+    def test_individual_product_and_profile_deletions_clean_images_after_commit(self):
+        product = Product.objects.create(
+            name='Delete image product',
+            slug='delete-image-product',
+            price='100.00',
+            stock=1,
+            image=make_test_image('delete-product.png'),
+        )
+        profile = Profile.objects.create(user=self.user, image=make_test_image('delete-profile.png'))
+        product_path = product.image.path
+        profile_path = profile.image.path
+        request = RequestFactory().post('/admin/')
+        product_admin = admin.site._registry[Product]
+        profile_admin = admin.site._registry[Profile]
+
+        with self.captureOnCommitCallbacks(execute=True):
+            product_admin.delete_model(request, product)
+            profile_admin.delete_model(request, profile)
+
+        self.assertFalse(Path(product_path).exists())
+        self.assertFalse(Path(profile_path).exists())
+
+    def test_clearing_profile_image_deletes_unreferenced_file_after_commit(self):
+        profile = Profile.objects.create(user=self.user, image=make_test_image('clear-profile.png'))
+        image_path = profile.image.path
+
+        with self.captureOnCommitCallbacks(execute=True):
+            profile.image = None
+            profile.save(update_fields=['image'])
+
+        profile.refresh_from_db()
+        self.assertFalse(profile.image)
+        self.assertFalse(Path(image_path).exists())
+
+    def test_admin_bulk_deletion_cleans_product_and_profile_images(self):
+        product = Product.objects.create(
+            name='Bulk delete image product',
+            slug='bulk-delete-image-product',
+            price='100.00',
+            stock=1,
+            image=make_test_image('bulk-product.png'),
+        )
+        profile = Profile.objects.create(user=self.user, image=make_test_image('bulk-profile.png'))
+        product_path = product.image.path
+        profile_path = profile.image.path
+        request = RequestFactory().post('/admin/')
+        product_admin = admin.site._registry[Product]
+        profile_admin = admin.site._registry[Profile]
+
+        with self.captureOnCommitCallbacks(execute=True):
+            product_admin.delete_queryset(request, Product.objects.filter(pk=product.pk))
+            profile_admin.delete_queryset(request, Profile.objects.filter(pk=profile.pk))
+
+        self.assertFalse(Path(product_path).exists())
+        self.assertFalse(Path(profile_path).exists())
+
+    def test_user_cascade_preserves_profile_image_referenced_by_a_product(self):
+        shared_profile = Profile.objects.create(user=self.user, image=make_test_image('shared-user.png'))
+        shared_name = shared_profile.image.name
+        shared_path = shared_profile.image.path
+        product = Product.objects.create(
+            name='Shared user image product',
+            slug='shared-user-image-product',
+            price='100.00',
+            stock=1,
+            image=shared_name,
+        )
+
+        with self.captureOnCommitCallbacks(execute=True):
+            self.user.delete()
+
+        self.assertFalse(Profile.objects.filter(pk=shared_profile.pk).exists())
+        self.assertTrue(Product.objects.filter(pk=product.pk, image=shared_name).exists())
+        self.assertTrue(Path(shared_path).exists())
+
+        with self.captureOnCommitCallbacks(execute=True):
+            product.delete()
+        self.assertFalse(Path(shared_path).exists())
+
+    def test_user_cascade_cleans_unshared_profile_image(self):
+        profile = Profile.objects.create(user=self.staff_user, image=make_test_image('unshared-user.png'))
+        image_path = profile.image.path
+
+        with self.captureOnCommitCallbacks(execute=True):
+            self.staff_user.delete()
+
+        self.assertFalse(Profile.objects.filter(pk=profile.pk).exists())
+        self.assertFalse(Path(image_path).exists())
+
+    def test_shared_profile_image_is_preserved_when_product_is_deleted(self):
+        profile = Profile.objects.create(user=self.user, image=make_test_image('shared-profile.png'))
+        image_name = profile.image.name
+        image_path = profile.image.path
+        product = Product.objects.create(
+            name='Shared profile image product',
+            slug='shared-profile-image-product',
+            price='100.00',
+            stock=1,
+            image=image_name,
+        )
+
+        with self.captureOnCommitCallbacks(execute=True):
+            product.delete()
+
+        self.assertTrue(Profile.objects.filter(pk=profile.pk, image=image_name).exists())
+        self.assertTrue(Path(image_path).exists())
+
+    def test_cloudinary_delete_exception_and_unconfirmed_result_are_reported(self):
+        image_name = 'profile_images/unconfirmed.png'
+
+        with patch('ramesh.models.default_storage.delete', side_effect=CloudinaryError('Cloudinary unavailable')):
+            with self.assertLogs('ramesh.models', level='ERROR') as logs:
+                self.assertFalse(delete_unreferenced_image(image_name))
+        self.assertIn('Could not delete unreferenced image', logs.output[0])
+
+        with patch('ramesh.models.default_storage.delete', return_value=False):
+            with self.assertLogs('ramesh.models', level='ERROR') as logs:
+                self.assertFalse(delete_unreferenced_image(image_name))
+        self.assertIn('did not confirm deletion', logs.output[0])
+
     def test_profile_replacement_keeps_old_file_when_another_record_references_it(self):
         profile = Profile.objects.create(user=self.user, image=make_test_image())
         old_name = profile.image.name
@@ -562,6 +719,20 @@ class ImageHandlingTests(TestCase):
 
         self.assertTrue(Path(old_path).exists())
         self.assertEqual(Product.objects.get(slug='shared-image-product').image.name, old_name)
+
+    def test_profile_replacement_keeps_old_file_when_another_profile_references_it(self):
+        profile = Profile.objects.create(user=self.user, image=make_test_image())
+        old_name = profile.image.name
+        old_path = profile.image.path
+        shared_profile = Profile.objects.create(user=self.staff_user, image=old_name)
+
+        with self.captureOnCommitCallbacks(execute=True):
+            profile.image = make_test_image('replacement.png')
+            profile.save()
+
+        self.assertTrue(Path(old_path).exists())
+        shared_profile.refresh_from_db()
+        self.assertEqual(shared_profile.image.name, old_name)
 
     def test_product_image_replacement_preserves_unrelated_updates_and_deletes_old_file(self):
         product = Product.objects.create(
@@ -595,13 +766,15 @@ class ImageHandlingTests(TestCase):
         client.force_login(self.user)
 
         invalid_response = client.post(
-            reverse('upload_profile_image'),
+            reverse('profile'),
             {'profile_image': SimpleUploadedFile('invalid.png', b'not an image')},
+            follow=True,
         )
         self.assertRedirects(invalid_response, reverse('profile'))
         profile.refresh_from_db()
         self.assertEqual(profile.image.name, old_name)
         self.assertTrue(Path(old_path).exists())
+        self.assertContains(invalid_response, 'Upload a valid image.')
 
         oversized = SimpleUploadedFile(
             'oversized.png',
@@ -648,6 +821,47 @@ class ImageHandlingTests(TestCase):
         profile = Profile.objects.get(user=self.user)
         self.assertTrue(Path(profile.image.path).exists())
         self.assertContains(client.get(reverse('profile')), profile.image.url)
+
+    def test_profile_page_uploads_and_displays_profile_image(self):
+        client = Client()
+        client.force_login(self.user)
+
+        response = client.post(
+            reverse('profile'),
+            {'profile_image': make_test_image('profile-page.png')},
+        )
+
+        self.assertRedirects(response, reverse('profile'))
+        profile = Profile.objects.get(user=self.user)
+        self.assertTrue(Path(profile.image.path).exists())
+        profile_response = client.get(reverse('profile'))
+        self.assertEqual(profile_response.context['profile_image'], profile.image.url)
+        self.assertContains(profile_response, profile.image.url)
+        self.assertContains(profile_response, 'name="profile_image"')
+        self.assertContains(profile_response, 'enctype="multipart/form-data"')
+
+    def test_profile_information_updates_without_changing_profile_image(self):
+        profile = Profile.objects.create(user=self.user, image=make_test_image())
+        image_name = profile.image.name
+        client = Client()
+        client.force_login(self.user)
+
+        response = client.post(
+            reverse('profile'),
+            {
+                'first_name': 'Updated',
+                'last_name': 'Customer',
+                'email': 'updated@example.com',
+            },
+        )
+
+        self.assertRedirects(response, reverse('profile'))
+        self.user.refresh_from_db()
+        profile.refresh_from_db()
+        self.assertEqual(self.user.first_name, 'Updated')
+        self.assertEqual(self.user.last_name, 'Customer')
+        self.assertEqual(self.user.email, 'updated@example.com')
+        self.assertEqual(profile.image.name, image_name)
 
     def test_image_validator_rejects_oversized_upload_before_decoding(self):
         oversized = SimpleUploadedFile(

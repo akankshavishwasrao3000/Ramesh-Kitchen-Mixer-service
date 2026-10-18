@@ -200,7 +200,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="profileImageForm" method="post" enctype="multipart/form-data" action="{% url 'upload_profile_image' %}">
+                <form id="profileImageForm" method="post" enctype="multipart/form-data" action="{% url 'profile' %}">
                     {% csrf_token %}
                     <div class="mb-3">
                         <label for="profileImage" class="form-label">Choose a new profile image</label>
