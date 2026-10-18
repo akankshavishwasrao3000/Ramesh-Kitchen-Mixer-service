@@ -1,130 +1,178 @@
-# Ramesh Kitchen Mixer 
+# Ramesh Kitchen Mixer Service
 
-Ramesh Kitchen Mixer is a Django-based business website developed for a local mixer repair and sales business. The platform allows customers to explore products, submit repair requests, place orders, and communicate directly through WhatsApp. The project focuses on digital business growth and customer engagement.
+Ramesh Kitchen Mixer Service is a Django-based digital platform and service website for a local kitchen appliance business. The website lets customers browse products, place appliance orders, submit repair requests, and contact the business through WhatsApp for quick follow-up.
 
-## 📌 Problem Statement
-Local businesses often struggle to reach a wider audience and manage service requests efficiently. "Ramesh Kitchen Mixer" addresses this by providing a digital storefront where customers can view high-quality kitchen appliances, book professional repairs, and place orders with direct WhatsApp integration for seamless manual confirmation, replacing traditional complex payment gateways with a trust-based local model.
+## Overview
+This project was built to help a small local business move from manual order handling to a digital platform. It provides a clean digital storefront experience, secure user login, product management through the Django admin panel, and a WhatsApp-driven confirmation flow that suits a trust-based local sales model.
 
-## ✨ Features
-*   **User Authentication**: Secure registration and login system for customers to track their activity.
-*   **Database-Managed Product Catalog**: Product names, descriptions, prices, images, stock, and availability are stored as Product records in MySQL and displayed on the storefront through Django ORM queries. Product details are not hard-coded in the product cards.
-*   **Product Administration**: The owner can add and update products, upload product images, and manage stock and availability through Django Admin.
-*   **Order Management**: The order form saves orders to the database using the selected product's current database price, then provides the existing WhatsApp confirmation workflow.
-*   **Repair Requests**: Dedicated module for users to book mixer repair services with problem descriptions.
-*   **AI Mixer Assistant**: A rule-based, lightweight chatbot to guide users through pricing, services, and location queries.
-*   **WhatsApp Integration**: Automatic message generation containing order/product details for quick business communication.
-*   **Admin Dashboard**: Django Admin interface for the owner to manage products, view orders, and update statuses.
-*   **Modern UI/UX**: Responsive design using Bootstrap 5, featuring sleek animations and a professional aesthetic.
-*   **Policy Pages**: Professional Privacy Policy, Terms & Conditions, and Shipping policies tailored for a local business.
+## Key Features
+- User registration and login with Django authentication
+- Product catalog stored in the database and displayed dynamically
+- Product inventory and availability management through Django admin
+- Order placement with quantity validation and stock checks
+- Repair request form for service and maintenance inquiries
+- WhatsApp order confirmation link generated after successful checkout
+- Responsive frontend using Bootstrap 5
+- Privacy, shipping, refund, and terms pages
+- Cloud media storage support using Cloudinary
+- Production-ready deployment configuration for Render and Railway
 
-## ⚙️ System Workflow (How it Works)
-*   **User Authentication**: The system uses Django’s built-in authentication system. Users can create a secure account, log in, and access their private profile to manage their orders and repair history.
-*   **Product Process**: The products page retrieves available Product records from MySQL through the Django ORM. The homepage links to the catalog without rendering product cards. The owner manages product details and uploads images in Django Admin (`/admin/`); templates render database records rather than maintaining product names, prices, or image paths in product cards.
-*   **Order Process**: When a user selects a product, the server resolves its database ID and uses the product's current database price when saving the order. The order-success page provides a pre-filled WhatsApp message containing the order details for confirmation with the owner.
-*   **Repair Requests**: Customers can submit an online request detailing their mixer issues. These requests are stored in the database and displayed in the **Admin Panel** for the shop owner to review and manage.
-*   **Centralized Management**: The shop owner uses the **Django Admin Panel** to monitor all user activity, update order statuses (e.g., from Processing to Delivered), and manage the product inventory efficiently.
+## Tech Stack
+- Backend: Python, Django 4.2
+- Database: MySQL
+- Frontend: HTML, CSS, JavaScript, Bootstrap 5
+- Storage: Cloudinary
+- Deployment: Gunicorn, WhiteNoise, Render/Railway-ready configuration
+- Environment management: python-dotenv
 
-## 🛠️ Technologies Used
-*   **Backend**: Python, Django 4.2
-*   **Database**: MySQL, configured through `MYSQL_URL`/`DATABASE_URL` or the `DB_*` environment variables
-*   **Frontend**: HTML5, CSS3, JavaScript (Vanilla), Bootstrap 5
-*   **Authentication**: Django Auth System
-*   **Environment Management**: Python-dotenv
-*   **Styling**: Font Awesome, Google Fonts, Bootstrap Icons
+## How the Application Works
+1. Customers browse the product catalog from the database.
+2. They choose a product, enter their details, and place an order.
+3. The order is validated and saved with the current product price and quantity.
+4. After a successful order, users are redirected to a confirmation page containing a WhatsApp message link.
+5. Business owners can review and manage products, orders, and repair requests in the Django admin panel.
+6. Repair requests are submitted through the customer support form and stored for business follow-up.
 
-## 📂 Project Structure
+## Project Structure
 ```text
 home/
-├── home/                   # Project Configuration
-│   ├── settings.py         # Global Settings
-│   ├── urls.py             # Main Route Mapping
-│   └── wsgi.py             # Web Server Entry Point
-├── ramesh/                 # Main Business Application
-│   ├── models.py           # Database models (Product, Order, Repair, Profile)
-│   ├── views.py            # Business Logic & Request Handling
-│   ├── urls.py             # App-specific Routes
-│   ├── admin.py            # Admin Panel Configurations
-│   └── forms.py            # User Input Validation
-├── templates/              # HTML Templates (Bootstrap 5)
-├── static/                 # Static Assets (CSS, JS, Images)
-├── media/                  # Uploaded product and profile images (local development)
-├── requirements.txt        # Project Dependencies
-├── .env                    # Environment Variables (Sensitive)
-└── manage.py               # Django Management Script
+├── home/
+│   ├── settings.py
+│   ├── urls.py
+│   ├── wsgi.py
+│   └── certs/
+├── ramesh/
+│   ├── admin.py
+│   ├── apps.py
+│   ├── forms.py
+│   ├── models.py
+│   ├── order_services.py
+│   ├── templates/
+│   ├── urls.py
+│   ├── validators.py
+│   └── views.py
+├── templates/
+├── static/
+├── media/
+├── manage.py
+├── requirements.txt
+├── Procfile
+├── runtime.txt
+├── .env.example (if present)
+├── .gitignore
+├── LICENSE
+├── README.md
+└── db.sqlite3
 ```
 
-## 🗄️ Database Information
-The project uses the configured **MySQL** database for application records. Product catalog content is database-driven: product records are queried with Django ORM and rendered by the storefront templates.
-*   **Product Model**: Stores product name, slug, description, price, image, stock, availability, and timestamps. Product images are uploaded through Django Admin and stored under the configured media directory in local development.
-*   **Order Model**: Stores customer details, product info, and order status.
-*   **Repair Model**: Tracks service requests and customer contact info.
-*   **Profile Model**: Handles user-specific data and profile images.
+## Database Design
+The application uses MySQL for persistent records and Django ORM for interacting with the database.
 
-To manage storefront products, sign in with a staff or superuser account at `/admin/`, open **Products**, and add or edit records there. Mark a product as available for it to appear in the catalog. Uploaded product images are served from `MEDIA_URL` during local development; production deployments need persistent media storage configured.
+Main models include:
+- Product: product name, price, stock, availability, description, and image
+- Order: customer details, order amount, delivery, product reference, and status
+- Repair: service request details, customer contact info, and city
+- Profile: user-specific profile image and related account data
 
-## 🚀 Installation & Local Setup
+## Environment Variables
+Create a `.env` file in the project root with variables similar to:
 
-1. **Clone the repository**:
-   ```bash
-   git clone <repository-url>
-   cd project-folder
-   ```
+```env
+SECRET_KEY=your_secret_key
+DEBUG=True
+MYSQL_DATABASE=ramesh_mixer_db
+MYSQL_USER=your_mysql_user
+MYSQL_PASSWORD=your_mysql_password
+MYSQL_HOST=localhost
+MYSQL_PORT=3306
+ALLOWED_HOSTS=127.0.0.1,localhost
+CSRF_TRUSTED_ORIGINS=http://127.0.0.1:8000,http://localhost:8000
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+```
 
-2. **Create and Activate Virtual Environment**:
-   ```bash
-   python -m venv venv
-   # On Windows
-   venv\Scripts\activate
-   # On macOS/Linux
-   source venv/bin/activate
-   ```
+For production deployment, set the appropriate values for your hosting platform and include the live domain in `ALLOWED_HOSTS` and `CSRF_TRUSTED_ORIGINS`.
 
-3. **Install Dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
+## Local Setup
 
-4. **Setup Environment Variables**:
-   Create a `.env` file in the root directory and add the following:
-   ```env
-   SECRET_KEY=your_secret_key
-   DEBUG=True
-   DB_NAME=your_database_name
-   DB_USER=your_database_user
-   DB_PASSWORD=your_database_password
-   DB_HOST=localhost
-   DB_PORT=3306
-   ```
+1. Clone the repository
+```bash
+git clone <repository-url>
+cd home
+```
 
-5. **Apply the existing migrations**:
-   ```bash
-   python manage.py migrate
-   ```
+2. Create and activate a virtual environment
+```bash
+python -m venv venv
+# Windows
+venv\Scripts\activate
+# macOS/Linux
+source venv/bin/activate
+```
 
-6. **Create Superuser (Admin)**:
-   ```bash
-   python manage.py createsuperuser
-   ```
+3. Install dependencies
+```bash
+pip install -r requirements.txt
+```
 
-7. **Run Server**:
-   ```bash
-   python manage.py runserver
-   ```
+4. Configure environment variables in a `.env` file
 
+5. Apply database migrations
+```bash
+python manage.py migrate
+```
 
-## 🔮 Future Enhancements
-*   **Payment Gateway**: Manual order confirmation via WhatsApp or phone.
-*   **Order Tracking**: Real-time status updates for orders and repairs.
-*   **Notifications**: Automated email and SMS notifications for customers.
-*   **Search & Filter**: Additional product attributes and category filtering as the catalog grows.
-*   **Customer Reviews**: Ratings and review system for products and services.
-*   **Inventory**: Automated stock management for spare parts.
-*   **Mobile App**: Dedicated Android/iOS application for easier access.
+6. Create an admin user
+```bash
+python manage.py createsuperuser
+```
 
-## 👤 Author
-Author: Akanksha Ramesh Vishwasrao
+7. Run the development server
+```bash
+python manage.py runserver
+```
+
+The app will typically run at:
+```text
+http://127.0.0.1:8000/
+```
+
+## Admin Panel
+Once the superuser is created, the admin interface is available at:
+```text
+http://127.0.0.1:8000/admin/
+```
+
+Use the admin panel to:
+- add or update product listings
+- manage stock and availability
+- review customer orders
+- monitor repair requests
+- update order status
+
+## Deployment Notes
+This project includes production-ready settings for hosting on cloud providers. The app is configured to work with:
+- MySQL database hosted remotely
+- Cloudinary for media uploads
+- WhiteNoise for static file serving
+- Gunicorn for application serving
+
+The `Procfile` includes a `collectstatic` step before the Django app starts, which is useful for deployment in containerized or platform-hosted environments.
+
+## Future Enhancements
+- online payment integration
+- order tracking dashboard
+- automated notifications and SMS/email alerts
+- product search and category filters
+- customer reviews and ratings
+- expanded inventory management for spare parts
+- mobile app support
+
+## Author
+Akanksha Ramesh Vishwasrao
 B.E. Computer Engineering
 Savitribai Phule Pune University (SPPU)
 
 ---
-© 2026 Ramesh Kitchen Mixer. All Rights Reserved.
+© 2026 Ramesh Kitchen Mixer Service. All rights reserved.

@@ -205,7 +205,7 @@ def order_success(request, order_id):
     
    
     whatsapp_number = "919921071945"  
-    message = f"Hello, I have placed an order for {order_obj.product_name}.\nName: {order_obj.name}\nMobile: {order_obj.phone}\n\nPlease contact me regarding this order."
+    message = f"Hello, I have placed an order for {order_obj.product_name}.\nName: {order_obj.name}\nPlease contact me regarding this order."
     
    
     import urllib.parse
