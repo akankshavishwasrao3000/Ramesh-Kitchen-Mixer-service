@@ -32,14 +32,19 @@ if not SECRET_KEY:
     else:
         raise ImproperlyConfigured("The SECRET_KEY environment variable is required when DEBUG=False.")
 # Host and CSRF settings ----------------------------------------------------
+render_host = "ramesh-kitchen-mixer-service-6fuw.onrender.com"
+render_origin = f"https://{render_host}"
+
 ALLOWED_HOSTS = [
     host.strip()
     for host in os.getenv(
         "ALLOWED_HOSTS",
-        "ramesh-kitchen-mixer-service-6fuw.onrender.com,ramesh-kitchen-mixer-service-production.up.railway.app,127.0.0.1,localhost"
+        f"{render_host},ramesh-kitchen-mixer-service-production.up.railway.app,127.0.0.1,localhost"
     ).split(',')
     if host.strip()
 ]
+if render_host not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(render_host)
 
 
 railway_domain = os.getenv("RAILWAY_PUBLIC_DOMAIN")
@@ -50,10 +55,12 @@ CSRF_TRUSTED_ORIGINS = [
     origin.strip()
     for origin in os.getenv(
         'CSRF_TRUSTED_ORIGINS',
-        'https://ramesh-kitchen-mixer-service-6fuw.onrender.com,https://ramesh-kitchen-mixer-service-production.up.railway.app,http://127.0.0.1:8000,http://localhost:8000'
+        f'{render_origin},https://ramesh-kitchen-mixer-service-production.up.railway.app,http://127.0.0.1:8000,http://localhost:8000'
     ).split(',')
     if origin.strip()
 ]
+if render_origin not in CSRF_TRUSTED_ORIGINS:
+    CSRF_TRUSTED_ORIGINS.append(render_origin)
 if railway_domain:
     origin = f"https://{railway_domain}"
     if origin not in CSRF_TRUSTED_ORIGINS:

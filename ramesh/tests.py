@@ -101,6 +101,88 @@ class AppFlowTests(TestCase):
         self.assertRedirects(response, reverse('login'))
         self.assertTrue(User.objects.filter(username='janedoe').exists())
 
+    def test_signup_get_renders_csrf_protected_form_for_render_origin(self):
+        client = Client(enforce_csrf_checks=True)
+        response = client.get(
+            reverse('signup'),
+            secure=True,
+            HTTP_HOST='ramesh-kitchen-mixer-service-6fuw.onrender.com',
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'name="csrfmiddlewaretoken"')
+        self.assertIn('csrftoken', client.cookies)
+        self.assertIn(
+            'ramesh-kitchen-mixer-service-6fuw.onrender.com',
+            settings.ALLOWED_HOSTS,
+        )
+        self.assertIn(
+            'https://ramesh-kitchen-mixer-service-6fuw.onrender.com',
+            settings.CSRF_TRUSTED_ORIGINS,
+        )
+
+    def test_signup_post_passes_csrf_validation_from_render_origin(self):
+        client = Client(enforce_csrf_checks=True)
+        url = reverse('signup')
+        host = 'ramesh-kitchen-mixer-service-6fuw.onrender.com'
+        response = client.get(url, secure=True, HTTP_HOST=host)
+        csrf_token = re.search(
+            r'name="csrfmiddlewaretoken" value="([^"]+)"',
+            response.content.decode(),
+        )
+        self.assertIsNotNone(csrf_token)
+
+        response = client.post(
+            url,
+            {
+                'csrfmiddlewaretoken': csrf_token.group(1),
+                'first_name': 'Jane',
+                'last_name': 'Doe',
+                'username': 'csrfjanedoe',
+                'email': 'csrfjane@example.com',
+                'password1': 'Testpass123',
+                'password2': 'Testpass123',
+            },
+            secure=True,
+            HTTP_HOST=host,
+            HTTP_ORIGIN='https://ramesh-kitchen-mixer-service-6fuw.onrender.com',
+        )
+
+        self.assertRedirects(response, reverse('login'))
+        self.assertTrue(User.objects.filter(username='csrfjanedoe').exists())
+
+    def test_signup_post_rejects_untrusted_origin_even_with_valid_csrf_token(self):
+        client = Client(enforce_csrf_checks=True)
+        host = 'ramesh-kitchen-mixer-service-6fuw.onrender.com'
+        response = client.get(
+            reverse('signup'),
+            secure=True,
+            HTTP_HOST=host,
+        )
+        csrf_token = re.search(
+            r'name="csrfmiddlewaretoken" value="([^"]+)"',
+            response.content.decode(),
+        )
+        self.assertIsNotNone(csrf_token)
+
+        response = client.post(
+            reverse('signup'),
+            {
+                'csrfmiddlewaretoken': csrf_token.group(1),
+                'first_name': 'Jane',
+                'last_name': 'Doe',
+                'username': 'untrustedjanedoe',
+                'email': 'untrusted@example.com',
+                'password1': 'Testpass123',
+                'password2': 'Testpass123',
+            },
+            secure=True,
+            HTTP_HOST=host,
+            HTTP_ORIGIN='https://untrusted.example.com',
+        )
+
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(User.objects.filter(username='untrustedjanedoe').exists())
+
     def test_signup_shows_existing_username_as_inline_message(self):
         response = self.client.post(
             reverse('signup'),
