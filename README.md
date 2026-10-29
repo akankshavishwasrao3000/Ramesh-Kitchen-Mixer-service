@@ -160,6 +160,11 @@ This project includes production-ready settings for hosting on cloud providers. 
 
 The `Procfile` includes a `collectstatic` step before the Django app starts, which is useful for deployment in containerized or platform-hosted environments.
 
+## Sitemap and Crawling
+
+The public sitemap is available at `/sitemap.xml` and includes the homepage, product, service, contact, and policy pages. The root `robots.txt` references the canonical sitemap URL:
+`https://ramesh-kitchen-mixer-service-6fuw.onrender.com/sitemap.xml`.
+
 ## Future Enhancements
 - online payment integration
 - order tracking dashboard

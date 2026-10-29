@@ -1,0 +1,2 @@
+User-agent: *
+Sitemap: https://ramesh-kitchen-mixer-service-6fuw.onrender.com/sitemap.xml
