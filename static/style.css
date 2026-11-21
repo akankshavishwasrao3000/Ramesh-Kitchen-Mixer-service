@@ -525,7 +525,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .faq-list details[open] summary::after {
-  content: "−";
+  content: "-";
 }
 
 .faq-list p {
@@ -1768,4 +1768,210 @@ textarea:focus-visible {
 .auth-screen .card {
   background: #191c1a;
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.22);
+}
+
+.site-header .navbar {
+  min-height: 82px;
+  padding-block: 0.65rem;
+  background: #fff;
+}
+
+.site-header .navbar > .container {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.site-header .navbar-brand {
+  flex: 0 1 auto;
+  min-width: 0;
+  margin-right: 0;
+  gap: 0.7rem;
+  white-space: normal;
+}
+
+.site-header .navbar-brand img {
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+}
+
+.brand-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: center;
+  line-height: 1.2;
+}
+
+.site-header .navbar-brand .brand-name {
+  color: var(--ink);
+  font-size: 0.98rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  white-space: nowrap;
+}
+
+.site-header .navbar-brand .brand-location {
+  margin-top: 0.15rem;
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.site-header .navbar-toggler {
+  flex: 0 0 auto;
+  padding: 0.45rem 0.6rem;
+  border-color: var(--border);
+  box-shadow: none;
+}
+
+.site-header .navbar-toggler:focus {
+  box-shadow: 0 0 0 0.2rem rgba(0, 131, 143, 0.16);
+}
+
+.site-header .navbar-collapse {
+  min-width: 0;
+}
+
+.site-header .navbar-nav {
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.site-header .navbar-nav .nav-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.58rem 0.68rem !important;
+  font-size: 0.9rem;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.site-header .nav-item-cta {
+  margin-left: 0.25rem;
+}
+
+.site-header .btn-whatsapp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 42px;
+  padding: 0.55rem 0.9rem;
+  font-size: 0.88rem;
+  white-space: nowrap;
+}
+
+.site-header .btn-whatsapp:hover,
+.site-header .btn-whatsapp:focus-visible {
+  color: #fff;
+  background: #1fbd5b;
+  box-shadow: 0 8px 18px rgba(37, 211, 102, 0.24);
+}
+
+@media (min-width: 1200px) {
+  .site-header .navbar-collapse {
+    display: flex !important;
+    flex-basis: auto;
+  }
+
+  .site-header .navbar-nav {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    margin-left: auto;
+  }
+}
+
+@media (max-width: 1199.98px) {
+  .site-header .navbar {
+    min-height: 74px;
+  }
+
+  .site-header .navbar > .container {
+    flex-wrap: wrap;
+  }
+
+  .site-header .navbar-brand {
+    margin-right: auto;
+  }
+
+  .site-header .navbar-collapse {
+    flex-basis: 100%;
+    padding-top: 0.65rem;
+  }
+
+  .site-header .navbar-nav {
+    align-items: stretch;
+    gap: 0.2rem;
+  }
+
+  .site-header .navbar-nav .nav-link {
+    justify-content: flex-start;
+    width: 100%;
+    padding: 0.7rem 0.85rem !important;
+    white-space: normal;
+  }
+
+  .site-header .nav-item-cta {
+    margin: 0.35rem 0 0;
+  }
+
+  .site-header .btn-whatsapp {
+    width: fit-content;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .site-header .navbar {
+    padding-block: 0.55rem;
+  }
+
+  .site-header .navbar > .container {
+    gap: 0.5rem;
+    padding-inline: 0.85rem;
+  }
+
+  .site-header .navbar-brand {
+    gap: 0.55rem;
+  }
+
+  .site-header .navbar-brand img {
+    flex-basis: 40px;
+    width: 40px;
+    height: 40px;
+  }
+
+  .site-header .navbar-brand .brand-name {
+    max-width: 230px;
+    font-size: 0.9rem;
+    white-space: normal;
+  }
+
+  .site-header .navbar-brand .brand-location {
+    font-size: 0.68rem;
+  }
+
+  .announcement-bar .container {
+    flex-direction: row;
+    gap: 0.5rem;
+    padding-inline: 0.85rem;
+  }
+}
+
+@media (max-width: 359.98px) {
+  .site-header .navbar-brand .brand-name {
+    max-width: 180px;
+    font-size: 0.84rem;
+  }
+
+  .site-header .navbar-toggler {
+    padding: 0.35rem 0.48rem;
+  }
 }

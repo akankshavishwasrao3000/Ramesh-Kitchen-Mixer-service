@@ -150,6 +150,17 @@ function getBotResponse(message) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+    const mainNavbar = document.getElementById('mainNavbar');
+    if (mainNavbar && window.bootstrap && window.bootstrap.Collapse) {
+        mainNavbar.querySelectorAll('a[href]').forEach((link) => {
+            link.addEventListener('click', () => {
+                if (window.matchMedia('(max-width: 1199.98px)').matches) {
+                    window.bootstrap.Collapse.getOrCreateInstance(mainNavbar).hide();
+                }
+            });
+        });
+    }
+
     const revealItems = document.querySelectorAll('.reveal-item');
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
