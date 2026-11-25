@@ -3,7 +3,7 @@
 {% block content %}
 
 
-<section class="py-5 bg-light">
+<section class="py-5 bg-light order-page">
   <div class="container">
 
     
@@ -15,7 +15,7 @@
     <div class="row justify-content-center">
       <div class="col-lg-8">
 
-        <div class="card border-0 shadow-lg">
+        <div class="card border-0 shadow-lg order-page-card">
           <div class="card-body p-5">
 
             <form method="POST" action="?product_id={{ request.GET.product_id }}">
@@ -53,6 +53,13 @@
                   <div class="form-floating">
                     <input type="number" name="total" id="total" class="form-control" readonly>
                     <label for="total"><i class="fas fa-calculator me-2"></i>Total Amount</label>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="order-total-preview">
+                    <span>Estimated subtotal</span>
+                    <output id="order-live-total" aria-live="polite">—</output>
+                    <small>This is a display estimate; your order is verified by the shop.</small>
                   </div>
                 </div>
 

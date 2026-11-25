@@ -6,10 +6,10 @@
 <div class="container py-5 mt-5 text-center">
     <div class="row justify-content-center">
         <div class="col-md-7">
-            <div class="card border-0 shadow-lg rounded-4 animation-fade-in">
+            <div class="card border-0 shadow-lg rounded-4 animation-fade-in order-success-card">
                 <div class="card-body p-5">
                     <div class="mb-4">
-                        <i class="bi bi-patch-check-fill text-success" style="font-size: 5.5rem;"></i>
+                        <div class="order-success-mark" aria-hidden="true"><i class="bi bi-check-lg" style="font-size: 3.8rem;"></i></div>
                     </div>
                     <h2 class="mb-3 text-dark fw-bold">Order Confirmed!</h2>
                     <p class="lead text-muted mb-4">
@@ -41,7 +41,7 @@
                     </div>
 
                     <div class="d-grid gap-2">
-                        <a href="{{ whatsapp_url }}" class="btn btn-success btn-lg rounded-pill shadow-sm py-3 fw-bold">
+                        <a href="{{ whatsapp_url }}" class="btn btn-success btn-lg rounded-pill shadow-sm py-3 fw-bold whatsapp-confirm">
                             <i class="fab fa-whatsapp me-2"></i> Confirm on WhatsApp
                         </a>
                         <div class="mt-3">

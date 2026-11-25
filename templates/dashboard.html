@@ -4,34 +4,22 @@
 {% block content %}
 <style>
     :root {
-        --primary: #191c1a;
-        --secondary: #00838F;
-        --success: #26A69A;
+        --primary: #59121b;
+        --secondary: #8d1b25;
+        --success: #48885c;
         --danger: #8a4b42;
-        --warning: #a87837;
-        --light: #F6F1E7;
-        --border: #e7e1d7;
+        --warning: #c99a45;
+        --light: #fbf7f0;
+        --border: rgba(91, 48, 37, 0.16);
     }
 
-    .dashboard-header {
-        background: #191c1a;
-        color: white;
-        padding: 30px 0;
-        margin-bottom: 40px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    .dashboard-intro-hero {
+        margin-bottom: 2.5rem;
     }
 
-    .dashboard-header h1 {
-        font-size: 2.5rem;
-        font-weight: 700;
-        margin-bottom: 10px;
-        letter-spacing: 0.5px;
-    }
-
-    .dashboard-header p {
-        font-size: 1rem;
-        opacity: 0.9;
-        margin: 0;
+    .dashboard-intro-hero .services-showreel-image img {
+        object-position: center;
+        background: #b90008;
     }
 
     .stats-grid {
@@ -43,15 +31,15 @@
 
     .stat-card {
         background: white;
-        border-radius: 10px;
+        border-radius: 22px;
         padding: 25px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        box-shadow: 0 10px 28px rgba(58, 35, 25, 0.09);
         transition: all 0.3s ease;
-        border-left: 5px solid var(--secondary);
+        border-left: 4px solid var(--secondary);
     }
 
     .stat-card:hover {
-        box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        box-shadow: 0 22px 54px rgba(58, 35, 25, 0.15);
         transform: translateY(-5px);
     }
 
@@ -84,10 +72,10 @@
 
     .table-section {
         background: white;
-        border-radius: 10px;
+        border-radius: 22px;
         padding: 30px;
         margin-bottom: 30px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        box-shadow: 0 10px 28px rgba(58, 35, 25, 0.09);
     }
 
     .section-title {
@@ -96,7 +84,7 @@
         color: var(--primary);
         margin-bottom: 25px;
         padding-bottom: 15px;
-        border-bottom: 3px solid var(--secondary);
+        border-bottom: 2px solid var(--warning);
         display: flex;
         align-items: center;
         gap: 10px;
@@ -149,12 +137,12 @@
     }
 
     .responsive-table tbody tr:hover {
-        background-color: #F8F9FA;
+        background-color: #fbf7f0;
         box-shadow: inset 4px 0 0 var(--secondary);
     }
 
     .responsive-table tbody tr:nth-child(even) {
-        background-color: #FAFBFC;
+        background-color: #fffdf9;
     }
 
     .responsive-table td {
@@ -199,7 +187,7 @@
     .btn-action {
         padding: 6px 12px;
         border: none;
-        border-radius: 5px;
+        border-radius: 999px;
         font-size: 0.85rem;
         font-weight: 600;
         cursor: pointer;
@@ -214,7 +202,7 @@
     }
 
     .btn-update:hover {
-        background-color: #006874;
+        background-color: var(--primary);
         box-shadow: 0 2px 8px rgba(0, 104, 116, 0.3);
     }
 
@@ -304,15 +292,6 @@
 
     /* Responsive Design */
     @media (max-width: 768px) {
-        .dashboard-header {
-            padding: 20px 0;
-            margin-bottom: 30px;
-        }
-
-        .dashboard-header h1 {
-            font-size: 1.8rem;
-        }
-
         .stats-grid {
             grid-template-columns: 1fr;
             gap: 15px;
@@ -353,15 +332,6 @@
     }
 
     @media (max-width: 480px) {
-        .dashboard-header {
-            padding: 15px 0;
-            margin-bottom: 20px;
-        }
-
-        .dashboard-header h1 {
-            font-size: 1.4rem;
-        }
-
         .responsive-table {
             font-size: 0.8rem;
         }
@@ -396,51 +366,23 @@
     }
 </style>
 
-<section class="dashboard-header dashboard-showreel" aria-label="Kitchen mixer dashboard slideshow">
-    <div id="dashboardShowreel" class="carousel slide carousel-fade" data-bs-interval="5500" data-bs-pause="hover">
-        <div class="carousel-indicators">
-            <button type="button" data-bs-target="#dashboardShowreel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Show mixer collection"></button>
-            <button type="button" data-bs-target="#dashboardShowreel" data-bs-slide-to="1" aria-label="Show kitchen inspiration"></button>
-            <button type="button" data-bs-target="#dashboardShowreel" data-bs-slide-to="2" aria-label="Show mixer service"></button>
+<section class="services-showreel dashboard-intro-hero" aria-label="Dashboard introduction">
+    <div class="services-showreel-image">
+        <img src="{% static 'logo.jpg' %}" alt="Ramesh Kitchen Mixer logo" width="1506" height="1045" loading="eager">
+    </div>
+    <div class="services-showreel-shade"></div>
+    <div class="container services-showreel-copy">
+        <span class="eyebrow">Personal support, from people who know mixers</span>
+        <h1>More than a mixer.<br>A team behind it.</h1>
+        <p>From finding the right kitchen essential to caring for the one you own, our local team is here to help.</p>
+        <div class="d-flex flex-wrap gap-3">
+            <a href="{% url 'products' %}" class="btn btn-light btn-lg">
+                <i class="fas fa-shopping-bag me-2" aria-hidden="true"></i>Explore products
+            </a>
+            <a href="{% url 'repair' %}" class="btn btn-outline-light btn-lg">
+                <i class="fas fa-wrench me-2" aria-hidden="true"></i>Book a repair
+            </a>
         </div>
-        <div class="carousel-inner">
-            <div class="carousel-item active">
-                <img class="dashboard-slide-image" src="{% static 'mi1.jpg' %}" alt="Ramesh mixer grinder in a warm home kitchen">
-                <div class="dashboard-slide-shade"></div>
-                <div class="container dashboard-slide-copy">
-                    <span class="dashboard-slide-kicker">Ramesh Kitchen Mixer · Management</span>
-                    <h1>Welcome to your<br>kitchen showroom.</h1>
-                    <p>Orders, repair requests, and customer activity—all in one place.</p>
-                    <a href="{% url 'products' %}" class="btn btn-light">View customer catalog</a>
-                </div>
-            </div>
-            <div class="carousel-item">
-                <img class="dashboard-slide-image" src="{% static 'mix2.jpg' %}" alt="Mixer grinder ready for everyday cooking">
-                <div class="dashboard-slide-shade"></div>
-                <div class="container dashboard-slide-copy">
-                    <span class="dashboard-slide-kicker">Made for everyday cooking</span>
-                    <h2>Thoughtful products.<br>Trusted local care.</h2>
-                    <p>Keep your product collection and customer experience moving.</p>
-                    <a href="{% url 'services' %}" class="btn btn-light">Explore services</a>
-                </div>
-            </div>
-            <div class="carousel-item">
-                <img class="dashboard-slide-image" src="{% static 'mixer3.jpg' %}" alt="Mixer in a bright, sunlit kitchen">
-                <div class="dashboard-slide-shade"></div>
-                <div class="container dashboard-slide-copy">
-                    <span class="dashboard-slide-kicker">Local expertise, personal support</span>
-                    <h2>Every detail helps<br>your business grow.</h2>
-                    <p>Review recent requests and keep service feeling personal.</p>
-                    <a href="{% url 'repair' %}" class="btn btn-light">Open repair requests</a>
-                </div>
-            </div>
-        </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#dashboardShowreel" data-bs-slide="prev" aria-label="Previous slide">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#dashboardShowreel" data-bs-slide="next" aria-label="Next slide">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        </button>
     </div>
 </section>
 

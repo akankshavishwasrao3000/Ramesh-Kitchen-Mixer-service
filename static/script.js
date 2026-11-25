@@ -184,14 +184,15 @@ document.addEventListener('DOMContentLoaded', function () {
         revealItems.forEach(item => item.classList.add('is-visible'));
     }
 
-    const dashboardShowreel = document.getElementById('dashboardShowreel');
-    if (dashboardShowreel && window.bootstrap?.Carousel) {
-        const showreel = window.bootstrap.Carousel.getOrCreateInstance(dashboardShowreel);
-        if (prefersReducedMotion) {
-            showreel.pause();
-        } else {
-            showreel.cycle();
-        }
+    if (window.bootstrap?.Carousel) {
+        document.querySelectorAll('.carousel').forEach((carousel) => {
+            const instance = window.bootstrap.Carousel.getOrCreateInstance(carousel);
+            if (prefersReducedMotion) {
+                instance.pause();
+            } else {
+                instance.cycle();
+            }
+        });
     }
 
 });

@@ -35,26 +35,28 @@
         <div class="row g-4 product-grid" id="product-grid">
             {% for product in products %}
             <article class="col-md-6 col-xl-4 product-card-item">
-                <div class="product-card">
+                <div class="product-card" data-tilt data-tilt-strength="6">
                     <div class="product-image-wrap">
                         {% if product.image %}
-                        <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy">
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}" width="600" height="600" loading="lazy">
                         {% else %}
-                        <img src="{% static 'mixer1.jpg' %}" alt="{{ product.name }}" loading="lazy">
+                        <div class="product-image-placeholder" role="img" aria-label="Image coming soon for {{ product.name }}">
+                            <i class="fas fa-blender" aria-hidden="true"></i>
+                            <span>Product image coming soon</span>
+                        </div>
                         {% endif %}
                         <span class="product-tag {% if product.stock > 0 %}is-available{% else %}is-sold-out{% endif %}">
-                            {% if product.stock > 0 %}In stock{% else %}Sold out{% endif %}
+                            <span class="product-tag-indicator" aria-hidden="true"></span>
+                            <span>{% if product.stock > 0 %}In stock{% else %}Sold out{% endif %}</span>
                         </span>
                     </div>
                     <div class="product-info">
                         <h3>{{ product.name }}</h3>
                         <div class="product-price">₹{{ product.price }}</div>
+                        <p class="product-stock">Stock: <span>{{ product.stock }}</span></p>
                         <div class="product-description">
                             {{ product.description|default:'Reliable kitchen mixer built for daily cooking needs.'|safe }}
                         </div>
-                        <p class="product-stock">
-                            {% if product.stock > 0 %}{{ product.stock }} available{% else %}Currently unavailable{% endif %}
-                        </p>
                         <div class="product-actions">
                             {% if user.is_authenticated and product.stock > 0 %}
                             <a href="{% url 'order' %}?product_id={{ product.pk }}" class="btn btn-primary">Order this mixer</a>
